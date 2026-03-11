@@ -1,0 +1,59 @@
+version: 1
+repository: personal-agent-skills
+packaging:
+  skills_mode: symlink_per_directory
+  template_policy: copy_if_missing
+  empty_skill_directories: forbidden_until_real_content_exists
+compatibility:
+  runtime:
+    host: openclaw
+    expected_workspace_layout:
+      skills_root: ../../skills
+      staged_repo_root: .
+  scope:
+    workspace_candidates:
+      - blogwatcher
+      - find-skills
+      - github
+      - mcporter
+      - model-usage
+      - obsidian
+      - openclaw-x-intel-report
+      - oracle
+      - proactive-agent
+      - self-improving-agent
+      - tavily-search
+    initial_manifest_batch:
+      - openclaw-x-intel-report
+      - proactive-agent
+      - self-improving-agent
+  excludes_not_packaged:
+    - memory
+    - reports
+    - .learnings
+    - session state / WAL / local cache
+    - Gateway runtime config and state
+  supported_skills:
+    openclaw-x-intel-report:
+      packaging: symlink_directory
+      template_policy: copy_if_missing
+      required_files:
+        - SKILL.md
+      status: ready_for_initial_manifest_batch
+    proactive-agent:
+      packaging: symlink_directory
+      template_policy: copy_if_missing
+      required_files:
+        - SKILL.md
+      status: ready_for_initial_manifest_batch
+    self-improving-agent:
+      packaging: symlink_directory
+      template_policy: copy_if_missing
+      required_files:
+        - SKILL.md
+      status: ready_for_initial_manifest_batch
+  repository_rules:
+    - Runtime state never enters this repository.
+    - Gateway changes are out of scope.
+    - Skill entries are mounted one directory at a time via symlink.
+    - Empty placeholder directories under skills/ are not allowed.

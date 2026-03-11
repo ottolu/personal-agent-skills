@@ -1,0 +1,23 @@
+# Generated repository staging ignore rules
+# Keep the staged repository focused on distributable skill packaging only.
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+
+# Local git / tool noise
+.git/
+
+# Explicitly excluded live-workspace state
+memory/
+reports/
+artifacts/
+.learnings/
+
+# Optional local bootstrap outputs that should not be committed
+bootstrap/out/
+bootstrap/tmp/
+backups/

@@ -1,0 +1,63 @@
+version: 1
+repository:
+  name: personal-agent-skills
+  layout:
+    skills_mode: symlink_per_directory
+    templates_mode: copy_if_missing
+    templates_root: templates/workspace
+  scope:
+    workspace_candidates:
+      - blogwatcher
+      - find-skills
+      - github
+      - mcporter
+      - model-usage
+      - obsidian
+      - openclaw-x-intel-report
+      - oracle
+      - proactive-agent
+      - self-improving-agent
+      - tavily-search
+    initial_manifest_batch:
+      - openclaw-x-intel-report
+      - proactive-agent
+      - self-improving-agent
+  includes:
+    skills:
+      - openclaw-x-intel-report
+      - proactive-agent
+      - self-improving-agent
+  excludes:
+    paths:
+      - memory
+      - reports
+      - .learnings
+      - session state / WAL / local cache
+      - Gateway runtime config and state
+  constraints:
+    - Only create a directory under skills/ when that skill has real content committed into the repo.
+    - Do not pre-create empty placeholder directories for not-yet-migrated skills.
+    - Skills are linked into the live workspace one directory at a time via symlink.
+    - Templates are bootstrap-only and must be copied only when missing from templates/workspace.
+    - Skill-local assets remain inside each skill package unless they are explicitly curated into templates/workspace.
+    - Runtime state never enters this repository.
+    - Gateway is out of scope.
+skills:
+  - id: openclaw-x-intel-report
+    source: ../../skills/openclaw-x-intel-report
+    link_mode: symlink
+    link_path: skills/openclaw-x-intel-report
+    template_policy: copy_if_missing
+    status: included_in_initial_manifest_batch
+  - id: proactive-agent
+    source: ../../skills/proactive-agent
+    link_mode: symlink
+    link_path: skills/proactive-agent
+    template_policy: copy_if_missing
+    status: included_in_initial_manifest_batch
+  - id: self-improving-agent
+    source: ../../skills/self-improving-agent
+    link_mode: symlink
+    link_path: skills/self-improving-agent
+    template_policy: copy_if_missing
+    status: included_in_initial_manifest_batch
