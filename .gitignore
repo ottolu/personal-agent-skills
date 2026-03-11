@@ -8,16 +8,20 @@ Thumbs.db
 *.swo
 *.tmp
 
+# Python cache / build noise
+__pycache__/
+*.pyc
+
 # Local git / tool noise
 .git/
 
-# Explicitly excluded live-workspace state
-memory/
-reports/
-artifacts/
-.learnings/
+# Explicitly excluded live-workspace state at repo root only
+/memory/
+/reports/
+/artifacts/
+/.learnings/
 
 # Optional local bootstrap outputs that should not be committed
-bootstrap/out/
-bootstrap/tmp/
-backups/
+/bootstrap/out/
+/bootstrap/tmp/
+/backups/
