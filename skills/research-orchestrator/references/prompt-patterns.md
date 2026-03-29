@@ -1,93 +1,88 @@
-# Prompt patterns
+# Prompt Patterns
 
-## 1. Full Deep Research prompt
+Use this file as a **request-template library** for Full Deep Research tasks.
+Each template is intentionally compact. Fill in the fields, then adapt for the topic.
 
-```text
-帮我用 research-orchestrator 对“<主题>”做完整的 Deep Research。
+## Common fields
 
-要求：
-1. 在正式调研前，先进行一轮轻量搜索，并基于初步结果给出一个研究计划。
-2. 先不要直接写最终答案，先输出：
-   - 你对任务的理解
-   - 本次研究的 output orientation（exploration / decision-support / executive-brief / technical-due-diligence）及原因
-   - 关键子问题拆解
-   - 信息源类型与优先级
-   - 计划使用哪些 subagent / research lanes，以及各自分工
-   - red-team 会怎么做
-   - 预期交付结构
-   - 已知限制与可能的降级风险（如果有）
-3. 调研必须采用 Full Deep Research 工作流，不要 silently downgrade 成 Lite 或单线程总结。
-4. 至少采用以下多阶段结构：
-   - 规划 / 拆题
-   - 资料搜集 / Primary-source lane
-   - 分维度研究（至少两个 domain lanes）
-   - 独立 red-team / skeptic lane
-   - 综合与结论
-5. 信息源请分层处理：
-   - Tier 1：官方资料、论文、文档、源码、发布会、filings、原始数据
-   - Tier 2：可信媒体、研究博客、行业分析
-   - Tier 3：社区讨论、社交媒体、论坛观点
-6. 至少安排一个 lane 专门寻找：
-   - 反例
-   - 争议点
-   - 失败案例
-   - 相互矛盾的信息
-   - 可能过时或带营销偏差的说法
-7. 最终输出不要只是摘要，要包含：
-   - 执行说明（用了哪些 lanes / red-team 是否完成 / source mix）
-   - 全景综述
-   - 关键事实
-   - 主要分歧 / 争议点
-   - 我的核心判断
-   - 置信度分级
-   - 尚未验证的问题
-   - 如果继续深入，下一步该查什么
-8. 结论中请区分：
-   - 事实
-   - 推断
-   - 观点 / judgment
-9. 如果因为工具或运行环境限制无法满足 Full Deep Research，要在计划阶段明确告诉我，不要静默降级。
-```
+Most strong requests should specify:
+- **subject**
+- **objective**
+- **audience**
+- **output format**
+- **scope boundaries**
+- **source preferences**
+- **required skepticism / verification level**
+- **expected deliverable shape**
 
-## 2. Decision-support-oriented add-on
+---
 
-Use when the real goal is selection, recommendation, or strategic judgment.
-
-Add:
+## 1. Landscape / competitor mapping
 
 ```text
-输出不要只追求信息覆盖，也要服务于后续决策、汇报或复用。
-请优先形成可复用结构，如：
-- 3~7 条关键判断
-- 一页式结论摘要
-- 关键证据表
-- 对比矩阵
-- 后续行动建议
+Research subject: [market / category / topic]
+Objective: map the landscape, key players, segments, and strategic differences
+Audience: [me / leadership / product / investment team]
+Output format: [brief / memo / structured report]
+Scope boundaries: [geography, time range, excluded segments]
+Source preferences: prioritize Tier 1 sources, then credible industry analysis
+Required skepticism: identify hype, missing comparables, and weak evidence
+Expected deliverable: taxonomy, top players by segment, comparison table, strategic implications, red-team section
 ```
 
-## 3. Executive-brief-oriented add-on
-
-Use when the final deliverable is for a leader, meeting, memo, or presentation.
-
-Add:
+## 2. Technical due diligence
 
 ```text
-请采用结论先行的写法。
-先给出 5 条最重要判断，再展开证据与分歧点。
-控制结构清晰，避免信息堆砌。
+Research subject: [model / system / architecture / paper / product]
+Objective: verify the technical claims and assess implementation realism
+Audience: [research lead / engineering / CTO / investment team]
+Output format: technical diligence memo
+Scope boundaries: focus on [architecture / benchmarks / deployment / ecosystem]
+Source preferences: prioritize papers, repos, benchmarks, official docs, primary disclosures
+Required skepticism: look for benchmark inflation, hidden assumptions, missing baselines, and deployment gaps
+Expected deliverable: claims under review, technical evidence, benchmark assessment, implementation risks, bottom-line judgment, red-team section
 ```
 
-## 4. Technical-due-diligence-oriented add-on
-
-Use when the user wants serious technical scrutiny.
-
-Add:
+## 3. Product / company research
 
 ```text
-请重点审查：
-- 架构是否真实成立
-- benchmark / eval 是否有缺口或不公平比较
-- 是否存在 missing baseline
-- 是否有 marketing inflation
-- 哪些结论只是 demo 级证据，哪些结论有工程或 deployment 级证据
+Research subject: [company / product]
+Objective: understand capabilities, positioning, adoption, and risks
+Audience: [leadership / strategy / product]
+Output format: decision-support memo
+Scope boundaries: cover [product, GTM, competition, traction] and exclude [x]
+Source preferences: prioritize official materials, launches, filings, product docs, primary interviews when available
+Required skepticism: distinguish company claims from externally verified evidence
+Expected deliverable: capability map, positioning, competition, strengths/weaknesses, risks, recommendation, red-team section
 ```
+
+## 4. Market / theme scan
+
+```text
+Research subject: [theme / macro driver / trend]
+Objective: understand what is happening, why it matters, and what implications follow
+Audience: [me / leadership / strategy / investment]
+Output format: executive brief or analytical memo
+Scope boundaries: [time period, markets, assets, sectors]
+Source preferences: prioritize primary data, official releases, and high-quality analysis
+Required skepticism: separate durable drivers from narrative noise
+Expected deliverable: timeline, key drivers, implications, scenarios, uncertainties, red-team section
+```
+
+## 5. Research direction / academic topic survey
+
+```text
+Research subject: [research area / method / subfield]
+Objective: understand the state of the field, main approaches, leading papers, and open problems
+Audience: [researcher / research lead / technical team]
+Output format: structured research survey
+Scope boundaries: cover [subtopics] and exclude [x]
+Source preferences: prioritize papers, benchmarks, repos, and canonical surveys
+Required skepticism: identify benchmark fragility, unclear gains, and unresolved debates
+Expected deliverable: taxonomy, representative works, comparison dimensions, emerging trends, open questions, red-team section
+```
+
+## Usage note
+
+Do not paste these templates mechanically.
+Use them to make the request legible, scoped, and verifiable before the full run begins.

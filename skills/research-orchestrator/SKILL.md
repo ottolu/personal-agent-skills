@@ -30,7 +30,7 @@ You may still choose an **orientation** for the final output based on downstream
 - **technical-due-diligence-oriented**: stress-test technical claims, architecture, benchmarks, and risks
 
 These are **output lenses**, not execution modes. They do not reduce the depth requirement.
-If helpful, read `references/research-modes.md`.
+If helpful, read `references/output-orientations.md`.
 
 ## Execution contract
 
@@ -124,6 +124,22 @@ This lane should actively look for:
 - explanations that sound plausible but do not match the timing or evidence
 
 Do not reduce the red-team pass to a token paragraph. It should materially pressure-test the main thesis.
+
+### Minimum red-team deliverable standard
+
+At minimum, the red-team output should cover:
+1. **Evidence gaps**
+   - which important claims are still weakly supported, indirectly supported, or not yet well evidenced
+2. **Alternative explanations**
+   - what competing interpretation could also explain the observed facts
+3. **Boundary conditions**
+   - where the main conclusion may fail, narrow, or stop generalizing
+
+If no strong counterexample is found, do not just say "no issues found".
+Explicitly state:
+- which challenge directions were checked
+- which strong rebuttals were not found
+- which uncertainties still remain unresolved
 
 ## Source tiers are required
 
@@ -224,4 +240,4 @@ Use this shape when formulating or refining a deep-research request:
 - required verification / skepticism level
 - expected deliverable structure
 
-If helpful, read `references/prompt-patterns.md` for reusable templates.
+If helpful, read `references/prompt-patterns.md` for reusable request templates.
