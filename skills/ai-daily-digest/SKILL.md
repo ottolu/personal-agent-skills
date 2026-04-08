@@ -1,6 +1,6 @@
 ---
 name: ai-daily-digest
-description: "Fetch 90 top Hacker News blogs (curated by Karpathy), score/categorize/summarize articles using the agent's own model, and generate a daily Markdown digest with bilingual titles, Mermaid charts, tag cloud, and trend highlights. No external API key needed. Use when user mentions 'daily digest', 'RSS digest', 'blog digest', 'tech news', 'tech blog summary', or runs /ai-daily-digest. Trigger command: /ai-daily-digest."
+description: "Fetch 90 top Hacker News blogs (curated by Karpathy), score/categorize/summarize articles using the agent's own model, then deliver a chat-first daily digest, save a full Markdown report locally, and sync it to Obsidian. No external API key needed. Use when user mentions 'daily digest', 'RSS digest', 'blog digest', 'tech news', 'tech blog summary', or runs /ai-daily-digest. Trigger command: /ai-daily-digest."
 metadata:
   {
     "openclaw":
@@ -25,7 +25,14 @@ metadata:
 
 Generate a curated daily digest from 90 top tech blogs (Karpathy's HN Popularity Contest 2025 list).
 
-**Key difference from the original ai-daily-digest:** All AI analysis (scoring, categorization, summarization, trend highlights) is performed by YOU (the agent's main model) directly — no external Gemini/OpenAI API keys required.
+**Key difference from the original ai-daily-digest:** All AI analysis (scoring, categorization, summarization, trend highlights) is performed by YOU (the agent's main model) directly, no external Gemini/OpenAI API keys required.
+
+**Default delivery order:**
+1. **Chat-first digest**: send Lewei a concise but high-signal summary in chat, with **Top 10** must-read picks.
+2. **Local artifact**: save a full Markdown report under the workspace `reports/ai-daily-digest/` directory.
+3. **Obsidian sync**: copy the final Markdown into `40-Outputs/Daily Digests/` inside the default Obsidian vault.
+
+Markdown rendering should use the template at `${SKILL_DIR}/references/digest-template.md`.
 
 ## Workflow
 
@@ -35,8 +42,10 @@ Step 1 → Collect parameters interactively
 Step 2 → Run fetch script (pure RSS, no AI)
 Step 3 → YOU score + categorize articles (batch of ~15)
 Step 4 → YOU summarize Top N + generate trend highlights
-Step 5 → Assemble and write Markdown report
-Step 6 → Display Top 3 preview to user
+Step 5 → Render chat digest + full markdown from template
+Step 6 → Send chat summary first (Top 10)
+Step 7 → Save local markdown and sync to Obsidian
+Step 8 → Save config and confirm artifact locations
 ```
 
 ---
@@ -52,46 +61,13 @@ If user confirms, skip to Step 2. If not found or user wants to reconfigure, go 
 
 ## Step 1: Collect Parameters
 
-Ask the user for these parameters using `question()`:
+Ask the user for these parameters:
 
-```
-question({
-  text: "选择时间范围",
-  key: "timeRange",
-  options: [
-    { label: "24 小时", value: "24" },
-    { label: "48 小时（推荐）", value: "48" },
-    { label: "72 小时", value: "72" },
-    { label: "7 天", value: "168" }
-  ],
-  defaultValue: "48"
-})
-```
+- `timeRange`: 24 / 48 / 72 / 168 hours, default `48`
+- `topN`: 10 / 15 / 20, default `15`
+- `lang`: `zh` / `en`, default `zh`
 
-```
-question({
-  text: "精选文章数量",
-  key: "topN",
-  options: [
-    { label: "10 篇", value: "10" },
-    { label: "15 篇（推荐）", value: "15" },
-    { label: "20 篇", value: "20" }
-  ],
-  defaultValue: "15"
-})
-```
-
-```
-question({
-  text: "输出语言",
-  key: "lang",
-  options: [
-    { label: "中文（推荐）", value: "zh" },
-    { label: "English", value: "en" }
-  ],
-  defaultValue: "zh"
-})
-```
+If the user gives a direct instruction in natural language, you may infer parameters without re-asking.
 
 ## Step 2: Run Fetch Script
 
@@ -102,6 +78,7 @@ npx -y bun ${SKILL_DIR}/scripts/fetch.ts --hours {timeRange} --output /tmp/daily
 ```
 
 This outputs a JSON file with structure:
+
 ```json
 {
   "fetchedAt": "...",
@@ -122,20 +99,20 @@ This outputs a JSON file with structure:
 }
 ```
 
-After execution, read the JSON file and report: "已抓取 {filteredCount} 篇文章（来自 {totalFeeds} 个源），开始 AI 分析..."
+After execution, report briefly: `已抓取 {filteredCount} 篇文章（来自 {successFeeds}/{totalFeeds} 个源），开始 AI 分析...`
 
 If `filteredCount` is 0, tell the user to try a larger `--hours` value and stop.
 
 ## Step 3: Score and Categorize (YOU do this)
 
-Process ALL fetched articles. Work in batches of ~15 articles. For each batch, analyze the articles and assign:
+Process all fetched articles. Work in batches of about 15 articles. For each article, assign:
 
-**Scoring (each 1-10):**
-- **Relevance**: How relevant to a tech-savvy audience (developers, engineers, researchers)
-- **Quality**: Writing quality, depth of insight, originality
-- **Timeliness**: How timely/important right now
+### Scoring (1-10 each)
+- **Relevance**: relevance to a tech-savvy audience
+- **Quality**: depth, originality, and signal
+- **Timeliness**: urgency or importance right now
 
-**Category** (one of):
+### Category (one of)
 | ID | Emoji | Label |
 |---|---|---|
 | `ai-ml` | 🤖 | AI / ML |
@@ -145,130 +122,111 @@ Process ALL fetched articles. Work in batches of ~15 articles. For each batch, a
 | `opinion` | 💡 | 观点 / 杂谈 |
 | `other` | 📝 | 其他 |
 
-**Keywords**: 3-5 keywords per article.
+### Keywords
+Assign 3-5 concise keywords per article.
 
-After scoring all articles, sort by total score (relevance + quality + timeliness) descending, take Top N.
+After scoring, sort by total score descending and take Top N.
 
 ## Step 4: Summarize Top N + Trend Highlights (YOU do this)
 
 For each Top N article, generate:
-- **titleZh**: Chinese translation of the title (if lang=zh; skip if lang=en)
-- **summary**: 4-6 sentence summary (in the chosen language)
-- **reason**: One sentence explaining why it's worth reading
+- `titleZh`: Chinese translation when `lang=zh`
+- `summary`: 3-5 sentence summary in the chosen language
+- `reason`: one sentence on why it is worth reading
 
-Then, looking at all Top N articles together, write **2-3 macro trend highlights** — what patterns or themes emerge from today's top articles. Write this as a cohesive paragraph (3-5 sentences).
+Then produce:
+- **oneLineTakeaway**: one sentence capturing the single most important conclusion from today's digest
+- **trendHighlights**: 2-3 macro trends synthesized into a cohesive paragraph
 
-## Step 5: Assemble Markdown Report
+If a source description is sparse, say the summary is based on limited available metadata.
 
-Build the report and write it to `./output/digest-{YYYYMMDD}.md` (create the `output/` directory if needed). Use this exact structure:
+## Step 5: Render Chat Digest + Full Markdown
+
+Use `${SKILL_DIR}/references/digest-template.md` as the default template.
+
+### Chat digest requirements
+The chat version is the **primary deliverable**. It must be concise enough to read in chat, but substantial enough to be useful without opening the Markdown file.
+
+It should include:
+- title and date
+- one-line takeaway
+- 2-3 trend bullets or a short trend paragraph
+- **Top 10 must-read picks**
+  - rank
+  - Chinese title if applicable
+  - source
+  - 1-2 sentence summary
+  - why worth reading
+- a brief closing note indicating the full report has been saved locally and synced to Obsidian
+
+### Full markdown requirements
+The Markdown file is the **secondary artifact**. It should include:
+- one-line takeaway
+- trend highlights
+- Top N full picks
+- statistics table
+- category pie chart
+- keyword bar chart
+- ASCII keyword bars
+- tag cloud
+- category-organized expanded sections
+- local and Obsidian paths
+- generation timestamp and config
+
+## Step 6: Send Chat Summary First
+
+Send the chat digest before writing about file paths in detail.
+
+Preferred chat structure:
 
 ```markdown
 # 📰 AI 博客每日精选 — {YYYY-MM-DD}
 
-> 来自 Karpathy 推荐的 90 个顶级技术博客，AI 精选 Top {N}
+一句话判断：{oneLineTakeaway}
 
-## 📝 今日看点
+今日趋势：
+- ...
+- ...
+- ...
 
-{trend highlights paragraph}
-
----
-
-## 🏆 今日必读
-
-🥇 **{titleZh or title}**
-
-[{original title}]({link}) — {sourceName} · {relative time} · {category emoji} {category label}
-
-> {summary}
-
-💡 **为什么值得读**: {reason}
-
-🏷️ {keywords joined by ", "}
-
-🥈 **{...}**
+今日 Top 10：
+1. {titleZh}｜{sourceName}
+   - 摘要：...
+   - 为什么值得读：...
 ...
+10. ...
 
-🥉 **{...}**
-...
-
----
-
-## 📊 数据概览
-
-| 扫描源 | 抓取文章 | 时间范围 | 精选 |
-|:---:|:---:|:---:|:---:|
-| {successFeeds}/{totalFeeds} | {totalArticles} 篇 → {filteredCount} 篇 | {hours}h | **{topN} 篇** |
-
-### 分类分布
-
-```mermaid
-pie showData
-    title "文章分类分布"
-    "{emoji} {label}" : {count}
-    ...
+已为你同步生成完整 Markdown，并准备写入本地与 Obsidian。
 ```
 
-### 高频关键词
+If the platform is sensitive to long messages, keep each item compact rather than dropping coverage below Top 10.
 
-```mermaid
-xychart-beta horizontal
-    title "高频关键词"
-    x-axis [{keywords as quoted strings}]
-    y-axis "出现次数" 0 --> {max+2}
-    bar [{counts}]
+## Step 7: Save Local Markdown and Sync to Obsidian
+
+### Local path
+Save the full report to:
+
+```text
+reports/ai-daily-digest/digest-{YYYYMMDD}.md
 ```
 
-<details>
-<summary>📈 纯文本关键词图（终端友好）</summary>
+Create the directory if needed.
 
-```
-{keyword padded} │ {█ bar} {count}
-...
-```
+### Obsidian path
+Sync the same final Markdown content to:
 
-</details>
-
-### 🏷️ 话题标签
-
-{top 20 keywords: top 3 bolded — word(count) · word(count) · ...}
-
----
-
-## {category emoji} {category label}
-
-### {index}. {titleZh or title}
-
-[{original title}]({link}) — **{sourceName}** · {relative time} · ⭐ {totalScore}/30
-
-> {summary}
-
-🏷️ {keywords}
-
----
-
-{repeat for all categories, sorted by article count descending}
-
-*生成于 {YYYY-MM-DD} {HH:mm} | 扫描 {successFeeds} 源 → 获取 {totalArticles} 篇 → 精选 {topN} 篇*
-*基于 [Hacker News Popularity Contest 2025](https://refactoringenglish.com/tools/hn-popularity/) RSS 源列表，由 [Andrej Karpathy](https://x.com/karpathy) 推荐*
+```text
+/Users/luotto/Documents/Obsidian Vault/40-Outputs/Daily Digests/AI Daily Digest - {YYYY-MM-DD}.md
 ```
 
-### Relative Time Format
+If the target directory does not exist, create it.
 
-- < 60 min: "{n} 分钟前"
-- < 24 hours: "{n} 小时前"
-- < 7 days: "{n} 天前"
-- Otherwise: YYYY-MM-DD
+Reasoning: this is a recurring aggregated output, so it belongs in `40-Outputs/` rather than single-article reading notes under `20-Knowledge/`.
 
-### Chart Details
+## Step 8: Save Config and Confirm Artifact Locations
 
-- **Pie chart**: All categories that have articles, sorted by count descending.
-- **Bar chart**: Top 12 keywords by frequency across all Top N articles.
-- **ASCII bar chart**: Top 10 keywords, max bar width 20 chars (█ for filled, ░ for empty).
-- **Tag cloud**: Top 20 keywords, top 3 are **bold**, format: `word(count)` joined by ` · `.
+Save configuration to `~/.daily-digest/config.json`:
 
-## Step 6: Save Config and Display Results
-
-1. Save configuration to `~/.daily-digest/config.json`:
 ```json
 {
   "timeRange": {hours},
@@ -278,29 +236,25 @@ xychart-beta horizontal
 }
 ```
 
-2. Display results to user:
-```
-✅ 日报生成完成！
-
-📄 文件: ./output/digest-{YYYYMMDD}.md
-📊 统计: 扫描 {totalFeeds} 源 → {totalArticles} 篇 → 精选 {topN} 篇
-⏱️ 时间范围: {hours} 小时
-
-🏆 Top 3 预览:
-1. {titleZh} — {sourceName} (⭐ {score}/30)
-2. {titleZh} — {sourceName} (⭐ {score}/30)
-3. {titleZh} — {sourceName} (⭐ {score}/30)
-```
+Then briefly confirm:
+- local path
+- Obsidian path
+- number of sources scanned
+- total articles fetched
+- filtered article count
+- final Top N
 
 ## Error Handling
 
-- If fetch script fails: check if `bun` is installed, suggest `npm i -g bun`.
-- If 0 articles after filtering: suggest increasing `--hours`.
-- If network errors on most feeds: warn user about network connectivity.
+- If fetch fails, check whether `bun` exists, and suggest `npm i -g bun` if missing.
+- If filtered article count is 0, suggest increasing `--hours`.
+- If some feeds fail with 429 / timeout / socket errors, treat that as partial network variance unless failure rate is high.
+- If Obsidian write fails, still send the chat digest and save the local file, then clearly report the Obsidian sync failure.
 
 ## Notes
 
 - The fetch script outputs progress to stderr, article JSON to the output file.
-- All AI analysis is done by YOU — no external model calls, no API keys needed.
-- The scoring should be based on the article title + description snippet. Be honest in scoring — don't inflate scores uniformly.
-- When generating summaries, base them on the description available. If the description is sparse, note that the summary is based on limited information.
+- All AI analysis is done by YOU. No external model calls, no external API keys.
+- Be honest in scoring. Avoid uniform score inflation.
+- Chat delivery comes first. Local and Obsidian persistence are part of completion, not optional extras.
+- For this skill, chat-only completion is not enough, and file-only completion is also not enough. The task is complete only when **chat summary has been sent**, **local Markdown has been written**, and **Obsidian sync has succeeded** or been explicitly reported as failed.
