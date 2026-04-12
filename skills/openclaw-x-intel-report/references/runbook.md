@@ -23,6 +23,7 @@ Current job:
 - If reply sampling fails for a single post, mark it and continue report generation.
 - If 24h signals are insufficient, expand to 72h and mark fallback entries.
 - If evidence is incomplete, reduce quantity before reducing quality.
+- If the assembled report does not satisfy current constraints, regenerate the final markdown directly. Do not depend on patch-style edits against the saved long-form report.
 
 ### 4. Alerting
 At minimum, alert on:
@@ -46,17 +47,18 @@ These artifacts make partial reruns and debugging possible.
 ## Minimum operational SLA
 
 - By report deadline, there must be either:
-  1. a passed formal report, or
+  1. a passed formal report written as final publishable markdown, or
   2. a clear failure / degraded-mode notification
 
 Silent failure is not acceptable.
 
 ## Human handoff rules
 
-When a report fails because of evidence quality, parser issues, or upstream limits:
+When a report fails because of evidence quality, parser issues, upstream limits, or report-assembly mismatch:
 - do not silently publish
 - send a failure summary
 - include whether the failure is retryable or needs manual intervention
+- if the only issue is final markdown assembly, prefer full-block regeneration over patch editing
 
 ## Notes
 
@@ -65,3 +67,5 @@ This runbook documents the minimum operating posture. It should stay aligned wit
 - `assets/report-template.md`
 - `scripts/quality_gate.py`
 - cron payload in `~/.openclaw/cron/jobs.json`
+
+Any time counts or checklist wording change, update all four together before the next scheduled run. Misalignment must be treated as an operational bug.

@@ -89,18 +89,18 @@ def summary_length_ok(summary: str) -> tuple[bool, int]:
     return 100 <= n <= 200, n
 
 
-def parse_score(raw: str) -> float | None:
+def parse_score(raw: str):
     if not raw:
         return None
     m = re.search(r"(\d+(?:\.\d+)?)", raw)
     return float(m.group(1)) if m else None
 
 
-def parse_interactions(raw: str) -> tuple[int | None, int | None, int | None]:
+def parse_interactions(raw: str):
     if not raw:
         return None, None, None
 
-    def grab(patterns: list[str]) -> int | None:
+    def grab(patterns: list[str]):
         for pat in patterns:
             m = re.search(pat, raw, flags=re.I)
             if m:
@@ -201,9 +201,9 @@ def main() -> None:
     action_items = split_numbered_items(sec_actions)
 
     require(len(top_items) == 5, failed, f"Top Priority Signals 数量应为 5，当前 {len(top_items)}")
-    require(10 <= len(kol_items) <= 12, failed, f"A failed: KOL count {len(kol_items)} not in [10,12]")
-    require(3 <= len(cn_items) <= 5, failed, f"B failed: CN hot posts {len(cn_items)} not in [3,5]")
-    require(3 <= len(en_items) <= 5, failed, f"C failed: EN hot posts {len(en_items)} not in [3,5]")
+    require(15 <= len(kol_items) <= 20, failed, f"A failed: KOL count {len(kol_items)} not in [15,20]")
+    require(5 <= len(cn_items) <= 8, failed, f"B failed: CN hot posts {len(cn_items)} not in [5,8]")
+    require(5 <= len(en_items) <= 8, failed, f"C failed: EN hot posts {len(en_items)} not in [5,8]")
     require(len(watch_items) <= 3, failed, f"D failed: watchlist count {len(watch_items)} > 3")
     require(len(action_items) >= 3, failed, f"今日动作数量应 >= 3，当前 {len(action_items)}")
 
@@ -269,7 +269,7 @@ def main() -> None:
     kol_medium = sum(1 for m in kol_meta if 64 <= (m["score"] or 0) < 72)
     kol_zero = sum(1 for m in kol_meta if m["zero"])
     require(kol_high >= 8, failed, f"KOL 高置信条目不足：当前 {kol_high} < 8")
-    require(kol_medium <= 2, failed, f"KOL 中等置信补位过多：当前 {kol_medium} > 2")
+    require(kol_medium <= 7, failed, f"KOL 中等置信补位过多：当前 {kol_medium} > 7")
     require(kol_zero <= 2, failed, f"KOL 中 0互动例外过多：当前 {kol_zero} > 2")
 
     def bucket_check(name: str, metas: list[dict], strong_floor: float) -> None:

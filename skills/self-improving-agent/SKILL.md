@@ -25,6 +25,41 @@ Log learnings and errors to markdown files for continuous improvement. Coding ag
 | Tool gotchas | Promote to `TOOLS.md` (OpenClaw workspace) |
 | Behavioral patterns | Promote to `SOUL.md` (OpenClaw workspace) |
 
+## Health Report / Activity View
+
+This skill now includes a lightweight health report generator for OpenClaw workspaces.
+
+### What it checks
+- `.learnings/LEARNINGS.md`, `ERRORS.md`, `FEATURE_REQUESTS.md`
+- Recent 7-day / 14-day entry counts
+- Latest weekly review and promotion log under `reports/self-improvement/`
+- Live skill wiring (`workspace/skills/self-improving-agent` symlink)
+- Related cron jobs via `openclaw cron list --json` when available
+
+### Run it
+
+```bash
+python3 skills/self-improving-agent/scripts/health_report.py \
+  --workspace ~/.openclaw/workspace
+```
+
+Default output:
+- `reports/self-improvement/Health Report - YYYY-MM-DD.md`
+
+Optional modes:
+
+```bash
+# Print JSON summary
+python3 skills/self-improving-agent/scripts/health_report.py \
+  --workspace ~/.openclaw/workspace \
+  --json
+
+# Skip cron probing if you only want filesystem-based checks
+python3 skills/self-improving-agent/scripts/health_report.py \
+  --workspace ~/.openclaw/workspace \
+  --skip-cron
+```
+
 ## OpenClaw Setup (Recommended)
 
 OpenClaw is the primary platform for this skill. It uses workspace-based prompt injection with automatic skill loading.

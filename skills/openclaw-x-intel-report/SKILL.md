@@ -77,7 +77,7 @@ Each selected entry should carry:
 - confidence level
 - narrative tag
 
-### Step 4) Assemble report using template
+### Step 4) Assemble the final report in one pass
 
 Fill:
 - `assets/report-template.md`
@@ -85,12 +85,18 @@ Fill:
 Mandatory sections:
 1. Executive insights (3-5 bullets)
 2. Top priority signals (5 deep dives, each with reply insight)
-3. KOL list (10-12 entries, ranked)
-4. Chinese hot posts (3-5)
-5. English hot posts (3-5)
+3. KOL list (15-20 entries, ranked)
+4. Chinese hot posts (5-8)
+5. English hot posts (5-8)
 6. Watchlist / low-engagement high-signal observations (0-3)
 7. Actions for today (3 items, with owner/action/metric)
 8. Quality checklist
+
+**Critical output rule:** write the report as the **final publishable markdown in a single pass**.
+- Do not rely on a later patch/edit step to fix quotas, section titles, checklist counts, or wording.
+- Do not assume a post-generation `edit` pass will succeed on long markdown.
+- Before writing the file, reconcile the active constraints across `SKILL.md`, `assets/report-template.md`, `scripts/quality_gate.py`, and the cron payload.
+- The first saved report file should already be the version intended for delivery and for quality-gate validation.
 
 ### Step 5) Run quality gate
 
@@ -134,7 +140,7 @@ If the last 24h does not contain enough credible items:
 1. expand to the last 72h
 2. explicitly mark fallback entries as `72h`
 3. prefer **reducing quantity before reducing quality**
-4. shrink KOL / CN / EN section sizes before relaxing thresholds
+4. keep the target ranges aligned with the active gate (KOL 15-20, CN 5-8, EN 5-8), but when hard evidence is insufficient, explicitly report blockage instead of backfilling weak items
 5. move weak-but-interesting items into watchlist instead of stuffing them into the main body
 6. if quality still cannot be met, report the blockage instead of filling with weak content
 
@@ -161,3 +167,4 @@ If API/browser extraction degrades:
 - Use watchlist for early / low-spread but still credible observations.
 - If quality cannot be met, explicitly report the blockage and missing data source.
 - Do not let template completeness masquerade as evidence completeness.
+- Avoid post-generation markdown patching. If a section is wrong, regenerate the final report block with correct values instead of attempting a fragile text edit on the finished report.
