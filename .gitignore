@@ -25,3 +25,4 @@ __pycache__/
 /bootstrap/out/
 /bootstrap/tmp/
 /backups/
+/dist/
