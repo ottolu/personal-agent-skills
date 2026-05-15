@@ -1,0 +1,135 @@
+{
+  "$schema": "value-invest-sector-extension-v2",
+  "applies_to_company_type": "insurance",
+  "extension_purpose": "保险业兼有承保（财险/再保）与浮存金投资（寿险尤甚）双引擎，需用综合成本率衡量承保盈利、用内含价值/新业务价值衡量寿险长期价值、用偿付能力衡量风险抵抗力，常规 PE/DCF 严重失真。",
+
+  "scorecard_extension": {
+    "additional_dimensions": [
+      {
+        "name": "underwriting_quality",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "business_quality",
+        "anchor_table": {
+          "0": "综合成本率 > 110% 长期承保亏损且无法用投资覆盖",
+          "3": "综合成本率 100-105% 承保微亏，依赖投资",
+          "5": "综合成本率 97-100% 承保打平",
+          "7": "综合成本率 92-97% 承保稳定盈利",
+          "10": "综合成本率 < 92% 长期承保暴利（GEICO/Markel 水准）"
+        }
+      },
+      {
+        "name": "ev_nbv_growth_quality",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "business_quality",
+        "anchor_table": {
+          "0": "NBV 连续下滑 + EV 增速 < 0",
+          "3": "NBV 负增长但 EV 微增",
+          "5": "NBV 增速 0-5%、EV 增速 5-10%",
+          "7": "NBV 增速 5-15%、EV 增速 10-15%",
+          "10": "NBV 增速 > 15%、EV 增速 > 15% 长期复合"
+        }
+      },
+      {
+        "name": "solvency_buffer",
+        "weight_within_parent_dimension": "0.5",
+        "parent_dimension": "risk",
+        "anchor_table": {
+          "0": "偿付能力充足率 < 监管线，限制业务/被接管",
+          "3": "偿付能力勉强达标（综合 100-130%），缓冲薄",
+          "5": "偿付能力 130-180%，行业平均",
+          "7": "偿付能力 180-250%，稳健",
+          "10": "偿付能力 > 250%，可承受巨灾且能逆周期扩张"
+        }
+      },
+      {
+        "name": "investment_alpha",
+        "weight_within_parent_dimension": "0.3",
+        "parent_dimension": "management",
+        "anchor_table": {
+          "0": "投资收益率长期跑输基准且踩雷",
+          "3": "投资收益率波动大略低于市场",
+          "5": "投资收益率 4-5% 中规中矩",
+          "7": "投资收益率 5-7% 持续跑赢基准",
+          "10": "投资收益率长期 > 7% 且波动小（BRK 水准）"
+        }
+      }
+    ]
+  },
+
+  "financial_fields_extension": {
+    "fields": [
+      {"field_name": "combined_ratio_pct", "type": "number", "unit": "%", "description": "综合成本率 = 赔付率 + 费用率（财险关键）", "good_range": "< 97", "warning_range": "> 100"},
+      {"field_name": "embedded_value_cny_bn", "type": "number", "unit": "十亿元", "description": "内含价值 EV = 调整后净资产 + 有效业务价值（寿险关键）", "good_range": "持续增长 > 10%", "warning_range": "增速 < 5% 或下滑"},
+      {"field_name": "nbv_cny_bn", "type": "number", "unit": "十亿元", "description": "新业务价值 NBV", "good_range": "增速 > 10%", "warning_range": "负增长"},
+      {"field_name": "nbv_margin_pct", "type": "number", "unit": "%", "description": "新业务价值率 = NBV / 新保费", "good_range": "> 30", "warning_range": "< 15"},
+      {"field_name": "investment_yield_pct", "type": "number", "unit": "%", "description": "总投资收益率", "good_range": "> 5", "warning_range": "< 3.5"},
+      {"field_name": "net_investment_yield_pct", "type": "number", "unit": "%", "description": "净投资收益率（剔除买卖价差）", "good_range": "> 4.5", "warning_range": "< 3.5"},
+      {"field_name": "reserves_cny_bn", "type": "number", "unit": "十亿元", "description": "准备金余额"},
+      {"field_name": "solvency_ratio_pct", "type": "number", "unit": "%", "description": "综合偿付能力充足率（C-ROSS 或 RBC）", "good_range": "> 180", "warning_range": "< 130"},
+      {"field_name": "core_solvency_ratio_pct", "type": "number", "unit": "%", "description": "核心偿付能力充足率", "good_range": "> 120", "warning_range": "< 70"},
+      {"field_name": "premium_growth_yoy_pct", "type": "number", "unit": "%", "description": "保费同比增速"},
+      {"field_name": "expense_ratio_pct", "type": "number", "unit": "%", "description": "费用率"},
+      {"field_name": "loss_ratio_pct", "type": "number", "unit": "%", "description": "赔付率"},
+      {"field_name": "duration_assets_liabilities_match", "type": "string", "unit": "年/匹配度", "description": "资产负债久期匹配（如 资产 7Y / 负债 12Y，缺口 -5Y）", "good_range": "缺口 < 2Y", "warning_range": "缺口 > 5Y"},
+      {"field_name": "policyholder_persistency_13m_pct", "type": "number", "unit": "%", "description": "13 个月保单继续率（寿险）", "good_range": "> 90", "warning_range": "< 80"},
+      {"field_name": "float_cny_bn", "type": "number", "unit": "十亿元", "description": "浮存金总额"},
+      {"field_name": "float_cost_pct", "type": "number", "unit": "%", "description": "浮存金成本率（财险负的更好）"}
+    ]
+  },
+
+  "red_flags_na_rules": {
+    "na_items": ["F1", "F2", "F3", "F4", "F5", "F6", "F8", "F9"],
+    "na_rationale": {
+      "F1": "保险无 OCF 与净利润直接可比关系，准备金计提扰动巨大",
+      "F2": "保险无应收账款主体科目",
+      "F3": "保险无存货",
+      "F4": "毛利率对保险不适用，用综合成本率/NBV margin",
+      "F5": "保险用 ROEV（内含价值回报率）替代 ROIC",
+      "F6": "保险有大量准备金负债与投资资产，存贷双高是业务本质",
+      "F8": "应收账款指标对保险无意义",
+      "F9": "存货指标对保险无意义"
+    },
+    "modified_rules": [
+      {"original": "F5 ROIC < WACC", "modified": "INS_MOD_F5 ROEV < 12% 持续 3 年", "rationale": "寿险用 ROEV 度量长期资本回报"},
+      {"original": "F4 毛利率持续下滑", "modified": "INS_MOD_F4 综合成本率持续上升突破 100% 或 NBV margin 持续下滑", "rationale": "保险盈利能力的核心指标"}
+    ],
+    "new_sector_flags": [
+      {"flag_id": "INS_F1", "description": "综合成本率连续两年 > 100%", "trigger_condition": "combined_ratio_pct 连续两期 > 100"},
+      {"flag_id": "INS_F2", "description": "偿付能力跌破监管红线（综合 < 100% 或核心 < 50%）", "trigger_condition": "solvency_ratio_pct < 100 OR core_solvency_ratio_pct < 50"},
+      {"flag_id": "INS_F3", "description": "NBV 连续两年负增长", "trigger_condition": "nbv_cny_bn 连续两期负增长"},
+      {"flag_id": "INS_F4", "description": "13 个月继续率 < 80%（保单流失严重）", "trigger_condition": "policyholder_persistency_13m_pct < 80"},
+      {"flag_id": "INS_F5", "description": "投资组合集中度过高（单一资产/单一发行人 > 10%）", "trigger_condition": "single_issuer_share > 10%"},
+      {"flag_id": "INS_F6", "description": "资产负债久期缺口 > 5 年", "trigger_condition": "abs(asset_duration - liability_duration) > 5"}
+    ]
+  },
+
+  "valuation_methods_priority": {
+    "primary": ["DDM", "EV+NBV multiple", "PB-ROE"],
+    "secondary": ["P/EV 分位", "PE on operating earnings (财险)"],
+    "avoid": ["DCF-FCFF", "EV/EBITDA"],
+    "avoid_rationale": "保险无 FCFF（准备金计提扰动），EBITDA 无意义。寿险必须用 EV + NBV 倍数法，财险可用 PE 但需用承保利润 + 投资收益拆分"
+  },
+
+  "data_sources_required": [
+    {"source_name": "公司年报/半年报", "url_pattern": "公司官网 IR / SEC / HKEX", "data_provided": "EV/NBV/综合成本率/偿付能力（中报必披）"},
+    {"source_name": "银保监会偿付能力季报", "url_pattern": "cbirc.gov.cn", "data_provided": "偿付能力 + 风险评级（A/B/C/D）"},
+    {"source_name": "精算假设附表", "url_pattern": "年报附注", "data_provided": "投资收益率假设 / 风险贴现率 / 死亡率假设"},
+    {"source_name": "Wind/Bloomberg", "url_pattern": "终端", "data_provided": "同业 P/EV 分位 / 行业 NBV 增速"}
+  ],
+
+  "peer_comparison_strategy": {
+    "ideal_peer_count": "3-5",
+    "peer_selection_rules": "区分寿险/财险/综合集团。寿险选 平安/友邦/MetLife；财险选 人保财/中国财险/Progressive/Travelers；综合集团选 平安/国寿/Allianz/AIG。",
+    "incomparability_default": false
+  },
+
+  "modifier_flags_common": ["state_owned", "regulated_heavily", "a_h_dual_listed"],
+
+  "default_required_pct": 25,
+
+  "examples_in_samples": [
+    {"ticker": "601318.SH", "company_name": "中国平安", "fits_archetype": "true"},
+    {"ticker": "1299.HK", "company_name": "友邦保险", "fits_archetype": "true"},
+    {"ticker": "MET", "company_name": "MetLife", "fits_archetype": "true"}
+  ]
+}

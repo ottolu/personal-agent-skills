@@ -1,0 +1,137 @@
+{
+  "$schema": "value-invest-sector-extension-v2",
+  "applies_to_company_type": "cyclical_commodity",
+  "extension_purpose": "大宗周期股（煤/油/铁矿/铜/铝）盈利与商品价格强相关，景气高点 PE 最低（陷阱）、低点 PE 最高（机会）。必须用 10 年正常化 EPS、PB 周期分位、成本曲线位置、长协占比、储量寿命分析，禁用单年 PE。",
+
+  "scorecard_extension": {
+    "additional_dimensions": [
+      {
+        "name": "cost_curve_position",
+        "weight_within_parent_dimension": "0.6",
+        "parent_dimension": "moat",
+        "anchor_table": {
+          "0": "成本曲线 > 75 分位（高成本），下行周期最先亏损",
+          "3": "成本曲线 50-75 分位",
+          "5": "成本曲线 25-50 分位（行业平均）",
+          "7": "成本曲线 10-25 分位（低成本）",
+          "10": "成本曲线 < 10 分位（最低成本生产商，全周期盈利，神华/必和必拓水准）"
+        }
+      },
+      {
+        "name": "reserves_longevity",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "business_quality",
+        "anchor_table": {
+          "0": "可采储量 < 5 年 + 找矿/补充能力弱",
+          "3": "可采储量 5-10 年",
+          "5": "可采储量 10-20 年",
+          "7": "可采储量 20-40 年 + 持续储量补充",
+          "10": "可采储量 > 40 年（神华水准），永续型资源"
+        }
+      },
+      {
+        "name": "vertical_integration_logistics",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "moat",
+        "anchor_table": {
+          "0": "无自有运输/港口，物流成本受制于人",
+          "3": "部分自有运输",
+          "5": "自有铁路或港口之一",
+          "7": "自有铁路 + 港口或船队",
+          "10": "矿山-铁路-港口-发电-销售一体化（神华水准）"
+        }
+      },
+      {
+        "name": "dividend_payout_quality",
+        "weight_within_parent_dimension": "0.3",
+        "parent_dimension": "management",
+        "anchor_table": {
+          "0": "高点不分红低点也不分红，资本配置差",
+          "3": "分红率 < 30%，不稳定",
+          "5": "分红率 30-50%，行业平均",
+          "7": "分红率 50-70%，承诺稳定",
+          "10": "分红率 > 70% 且周期内长期承诺 + 回购（高股息周期股标杆）"
+        }
+      }
+    ]
+  },
+
+  "financial_fields_extension": {
+    "fields": [
+      {
+        "field_name": "commodity_price_history_10y",
+        "type": "array",
+        "unit": "object[]",
+        "description": "近 10 年商品价格历史 [{year, avg_price, low, high}]，如煤价/油价/铁矿石/铜/铝"
+      },
+      {"field_name": "normalized_eps", "type": "number", "unit": "元/USD", "description": "10 年正常化 EPS（10 年均价对应的盈利），破除单年扰动"},
+      {"field_name": "normalized_pe", "type": "number", "unit": "x", "description": "PE on normalized EPS"},
+      {"field_name": "pb_cycle_percentile", "type": "number", "unit": "%", "description": "当前 PB 在 10 年 PB 分布中的分位（0=历史最低，100=历史最高）", "good_range": "< 30 (低估)", "warning_range": "> 70 (高估)"},
+      {"field_name": "long_term_contract_share_pct", "type": "number", "unit": "%", "description": "长协合同收入占比（缓冲价格波动）", "good_range": "> 50", "warning_range": "< 20"},
+      {"field_name": "cost_curve_position", "type": "number", "unit": "% (0-100)", "description": "全球成本曲线分位 (0=最低成本)", "good_range": "< 25", "warning_range": "> 75"},
+      {"field_name": "cash_cost_per_unit", "type": "number", "unit": "元/吨 或 USD/桶", "description": "现金生产成本（不含折旧）"},
+      {"field_name": "all_in_sustaining_cost_per_unit", "type": "number", "unit": "元/吨 或 USD/桶", "description": "AISC 全成本（含维持性资本支出）"},
+      {"field_name": "reserves_life_years", "type": "number", "unit": "年", "description": "可采储量 / 年产量", "good_range": "> 20", "warning_range": "< 10"},
+      {"field_name": "reserves_total_units", "type": "number", "unit": "亿吨/亿桶", "description": "总可采储量"},
+      {"field_name": "production_volume_units", "type": "number", "unit": "亿吨/亿桶", "description": "年产量"},
+      {"field_name": "own_logistics_value", "type": "object", "unit": "object", "description": "自有运输资产 {railway_km, port_capacity_mtpa, fleet_dwt, power_plants_gw}"},
+      {"field_name": "payout_ratio_pct", "type": "number", "unit": "%", "description": "派息率（分红/净利润）", "good_range": "> 60", "warning_range": "< 30"},
+      {"field_name": "dividend_yield_pct", "type": "number", "unit": "%", "description": "股息率", "good_range": "> 6", "warning_range": "< 3"},
+      {"field_name": "net_cash_position_cny_bn", "type": "number", "unit": "十亿元", "description": "净现金（现金 - 有息负债），高点蓄水池"},
+      {"field_name": "capex_to_da_ratio", "type": "number", "unit": "x", "description": "资本支出/折旧摊销，判断扩张/收缩"},
+      {"field_name": "cycle_position", "type": "string", "unit": "enum", "description": "周期位置: 'trough|early_recovery|mid_cycle|late_cycle|peak'"}
+    ]
+  },
+
+  "red_flags_na_rules": {
+    "_comment": "周期股需反向解读部分指标",
+    "na_items": ["F6"],
+    "na_rationale": {
+      "F6": "周期股高点积累大量净现金 + 同时保留部分长债是常态（高点蓄水池备低点逆周期），反向解读为优势而非红旗"
+    },
+    "modified_rules": [
+      {"original": "F6 存贷双高", "modified": "CYC_MOD_F6 高点净现金积累用于派息/回购/逆周期并购 = 加分项；只有当大量现金沉淀但无明确用途、同时短债融资成本高时才是红旗", "rationale": "周期股蓄水池策略"},
+      {"original": "F5 ROIC < WACC", "modified": "CYC_MOD_F5 看 10 年正常化 ROIC（穿越周期），低点单年 ROIC 低不构成红旗", "rationale": "周期穿越视角"},
+      {"original": "F4 毛利率下滑", "modified": "CYC_MOD_F4 毛利率下滑需归因（商品价 vs 自身竞争力），若同行同步下滑则是周期非个体问题", "rationale": "区分系统性 vs 个体"}
+    ],
+    "new_sector_flags": [
+      {"flag_id": "CYC_F1", "description": "成本曲线分位上移 > 10pp（成本竞争力下滑）", "trigger_condition": "cost_curve_position 同比上升 > 10"},
+      {"flag_id": "CYC_F2", "description": "储量寿命 < 10 年且补充乏力", "trigger_condition": "reserves_life_years < 10 AND no_new_reserves"},
+      {"flag_id": "CYC_F3", "description": "在周期高点大规模扩张资本支出（capex/DA > 2x）", "trigger_condition": "cycle_position in ['late_cycle','peak'] AND capex_to_da_ratio > 2"},
+      {"flag_id": "CYC_F4", "description": "PB 在 10 年 90% 分位以上（周期高点估值警告）", "trigger_condition": "pb_cycle_percentile > 90"},
+      {"flag_id": "CYC_F5", "description": "长协占比连续下滑 + 价格大幅低于现货（销售竞争力下降）", "trigger_condition": "long_term_contract_share_pct 持续下滑"},
+      {"flag_id": "CYC_F6", "description": "管理层在低点不回购也不分红反而高溢价并购", "trigger_condition": "cycle_position == 'trough' AND major_acquisition_at_premium"}
+    ]
+  },
+
+  "valuation_methods_priority": {
+    "primary": ["正常化 PE (on normalized EPS)", "PB 周期分位法", "重置成本法 (replacement cost)", "DDM (高分红周期股如神华)"],
+    "secondary": ["保守 DCF（用穿周期均价）", "EV/储量"],
+    "avoid": ["单年 PE", "PEG", "高点 EV/EBITDA"],
+    "avoid_rationale": "单年 PE 在周期顶点最低（陷阱）、低点最高（机会），方向完全相反。必须用穿周期视角"
+  },
+
+  "data_sources_required": [
+    {"source_name": "公司年报/季报", "url_pattern": "公司官网 IR / SEC / HKEX", "data_provided": "产销量 / 成本 / 长协占比 / 储量"},
+    {"source_name": "商品价格数据库", "url_pattern": "Wind 商品 / Bloomberg / Mysteel / 卓创资讯", "data_provided": "10 年价格历史 / 现货 / 期货"},
+    {"source_name": "行业协会与监管", "url_pattern": "中国煤炭工业协会 / IEA / OPEC / USGS", "data_provided": "产能 / 库存 / 行业供需平衡"},
+    {"source_name": "成本曲线数据", "url_pattern": "Wood Mackenzie / S&P Global / CRU", "data_provided": "全球成本曲线"},
+    {"source_name": "Wind / Bloomberg", "url_pattern": "终端", "data_provided": "10 年 PB/PE 分位 / 同业对比"}
+  ],
+
+  "peer_comparison_strategy": {
+    "ideal_peer_count": "3-5",
+    "peer_selection_rules": "同类商品 + 类似一体化深度。煤选神华/中煤/兖煤/Peabody；油选中海油/中石油/Exxon/Shell；铜选紫金/江铜/Freeport；铁矿选必和必拓/力拓/淡水河谷。横向比成本曲线 + 储量 + 派息率。",
+    "incomparability_default": false
+  },
+
+  "modifier_flags_common": ["with_policy_support", "state_owned", "a_h_dual_listed"],
+
+  "default_required_pct": 35,
+
+  "examples_in_samples": [
+    {"ticker": "601088.SH", "company_name": "中国神华", "fits_archetype": "true"},
+    {"ticker": "XOM", "company_name": "Exxon Mobil", "fits_archetype": "true"},
+    {"ticker": "601899.SH", "company_name": "紫金矿业", "fits_archetype": "true"}
+  ]
+}

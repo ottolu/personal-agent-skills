@@ -1,0 +1,118 @@
+{
+  "$schema": "value-invest-sector-extension-v2",
+  "applies_to_company_type": "utility_infrastructure_reit",
+  "extension_purpose": "公用事业 / 基础设施 / REIT 是受监管允许回报 + 高派息 + 稳定久期资产，盈利稳健但增长有限。必须用 DDM、FFO/AFFO、监管资产基础、派息率历史为核心，普通 PE/PEG 无意义。",
+
+  "scorecard_extension": {
+    "additional_dimensions": [
+      {
+        "name": "regulated_predictability",
+        "weight_within_parent_dimension": "0.6",
+        "parent_dimension": "moat",
+        "anchor_table": {
+          "0": "完全市场化 + 价格波动巨大，无监管回报",
+          "3": "部分监管，回报率不稳定",
+          "5": "监管允许回报 5-7%，调价周期 5-10 年",
+          "7": "监管允许回报 7-9%，调价机制透明",
+          "10": "监管允许回报 9-12% 长期稳定（美国受监管公用事业、领展 REIT 出租率 > 98%）"
+        }
+      },
+      {
+        "name": "dividend_sustainability",
+        "weight_within_parent_dimension": "0.5",
+        "parent_dimension": "financial_quality",
+        "anchor_table": {
+          "0": "派息率 > 100% 不可持续",
+          "3": "派息率 80-100%，无成长空间",
+          "5": "派息率 50-80%，行业平均",
+          "7": "派息率 60-80% + 5 年股息增长 > 5% CAGR",
+          "10": "派息率 60-80% + 长期股息增长 > 7% CAGR + 极高覆盖率（FFO/股息 > 1.5x）"
+        }
+      },
+      {
+        "name": "asset_quality_location",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "business_quality",
+        "anchor_table": {
+          "0": "资产偏远低能级 + 出租率 < 70%",
+          "3": "资产位置中等 + 出租率 80-90%",
+          "5": "资产位置较好 + 出租率 90-95%",
+          "7": "核心地段 + 出租率 > 95% + 加权租约 > 5 年",
+          "10": "顶级地段（领展香港核心商场）+ 出租率 > 98% + 长期租户结构稳定"
+        }
+      }
+    ]
+  },
+
+  "financial_fields_extension": {
+    "fields": [
+      {"field_name": "regulated_return_pct", "type": "number", "unit": "%", "description": "监管允许的资产基础回报率（ROE 上限）", "good_range": "8-12", "warning_range": "< 6"},
+      {"field_name": "rate_base_cny_bn", "type": "number", "unit": "十亿元/USD bn", "description": "Rate Base 受监管资产基础"},
+      {"field_name": "regulated_revenue_share_pct", "type": "number", "unit": "%", "description": "受监管收入占比", "good_range": "> 80", "warning_range": "< 50"},
+      {"field_name": "payout_ratio_pct", "type": "number", "unit": "%", "description": "派息率（分红/可派现金流）", "good_range": "60-80", "warning_range": "> 95 或 < 40"},
+      {"field_name": "dividend_yield_pct", "type": "number", "unit": "%", "description": "股息率", "good_range": "> 4", "warning_range": "< 2.5"},
+      {"field_name": "dividend_growth_5y_pct", "type": "number", "unit": "%", "description": "5 年股息复合增长率", "good_range": "> 5", "warning_range": "< 0 (削减)"},
+      {"field_name": "dividend_payment_history_years", "type": "number", "unit": "年", "description": "连续支付股息年数（贵族股标志）"},
+      {"field_name": "ffo_funds_from_operations_cny_bn", "type": "number", "unit": "十亿元", "description": "FFO = 净利润 + 折旧摊销 - 处置物业损益（REIT 关键）"},
+      {"field_name": "affo_adjusted_ffo_cny_bn", "type": "number", "unit": "十亿元", "description": "AFFO = FFO - 维持性资本支出 - 直线租金调整"},
+      {"field_name": "p_to_ffo_multiple", "type": "number", "unit": "x", "description": "P/FFO 倍数（REIT 主要估值）"},
+      {"field_name": "occupancy_rate_pct", "type": "number", "unit": "%", "description": "出租率（REIT 用）", "good_range": "> 95", "warning_range": "< 90"},
+      {"field_name": "weighted_avg_lease_term_years", "type": "number", "unit": "年", "description": "加权平均租约期限 WALT", "good_range": "> 5", "warning_range": "< 2"},
+      {"field_name": "duration_in_regulated_cycle_years", "type": "number", "unit": "年", "description": "当前监管调价周期剩余年数"},
+      {"field_name": "regulatory_lag_months", "type": "number", "unit": "月", "description": "监管滞后期（提价申请到实施）"},
+      {"field_name": "debt_to_ebitda_ratio", "type": "number", "unit": "x", "description": "净有息负债/EBITDA", "good_range": "< 5", "warning_range": "> 7"},
+      {"field_name": "interest_coverage_ratio", "type": "number", "unit": "x", "description": "EBITDA / 利息", "good_range": "> 3", "warning_range": "< 2"},
+      {"field_name": "renewable_energy_capex_share_pct", "type": "number", "unit": "%", "description": "新能源转型资本支出占比（utility 转型）"}
+    ]
+  },
+
+  "red_flags_na_rules": {
+    "na_items": ["F6"],
+    "na_rationale": {
+      "F6": "REIT/公用事业高负债 + 持有大量优质收益资产是业务本质，存贷双高需结合资产质量与利息覆盖率判断"
+    },
+    "modified_rules": [
+      {"original": "F5 ROIC < WACC", "modified": "UTL_MOD_F5 实际 ROE < 监管允许回报率 × 0.8 持续两年（监管下达不到上限）", "rationale": "受监管行业看与允许回报的差距"},
+      {"original": "F8 应收账款增速 > 营收增速", "modified": "UTL_MOD_F8 应收欠费规模异常增长（拖欠 / 政府欠款），具体看运营商欠款应收周转", "rationale": "公用事业常有政府/居民应收账款"}
+    ],
+    "new_sector_flags": [
+      {"flag_id": "UTL_F1", "description": "派息率 > 100% 长期不可持续", "trigger_condition": "payout_ratio_pct > 100 连续两年"},
+      {"flag_id": "UTL_F2", "description": "股息削减或暂停", "trigger_condition": "dividend_cut_yoy > 0"},
+      {"flag_id": "UTL_F3", "description": "出租率连续下滑 + 跌破 90%（REIT）", "trigger_condition": "occupancy_rate_pct 连续下滑 AND < 90"},
+      {"flag_id": "UTL_F4", "description": "监管裁定不利（提价被拒绝 / 监管允许回报下调）", "trigger_condition": "regulated_return_pct 同比下降"},
+      {"flag_id": "UTL_F5", "description": "利息覆盖率 < 2 + 利率上行环境", "trigger_condition": "interest_coverage_ratio < 2"},
+      {"flag_id": "UTL_F6", "description": "维持性 capex 大幅超 FFO（老化资产巨额翻新）", "trigger_condition": "maintenance_capex > 0.5 × FFO"},
+      {"flag_id": "UTL_F7", "description": "燃料/能源转型滞后导致搁浅资产风险", "trigger_condition": "stranded_assets_at_risk = true"}
+    ]
+  },
+
+  "valuation_methods_priority": {
+    "primary": ["DDM (Dividend Discount Model)", "FFO multiple (P/FFO)", "AFFO multiple"],
+    "secondary": ["重置成本法 (replacement cost)", "Rate Base × allowed_return（监管资产法）", "NAV (REIT)"],
+    "avoid": ["PE on GAAP earnings (depreciation distortion)", "EV/EBITDA without considering rate base"],
+    "avoid_rationale": "REIT 大量折旧扣减 GAAP 净利润但不反映真实经济现金流，必须用 FFO/AFFO；公用事业受监管允许回报锚定，DDM 最贴合"
+  },
+
+  "data_sources_required": [
+    {"source_name": "公司年报/季报", "url_pattern": "公司官网 IR / HKEX / SEC", "data_provided": "FFO/AFFO / 出租率 / WALT / 派息历史"},
+    {"source_name": "监管机构裁定文件", "url_pattern": "美国 FERC / 加州 PUC / 英国 Ofgem / 国家发改委", "data_provided": "允许回报率 / 提价裁定 / rate base"},
+    {"source_name": "REIT 行业协会数据", "url_pattern": "NAREIT / APREA", "data_provided": "REIT 行业平均 P/FFO / 出租率"},
+    {"source_name": "Bloomberg/Wind", "url_pattern": "终端", "data_provided": "历史股息率分位 / 同业对比"}
+  ],
+
+  "peer_comparison_strategy": {
+    "ideal_peer_count": "3-5",
+    "peer_selection_rules": "区分 utility / pipeline / REIT 子类。公用事业：长江电力/华能水电/National Grid/Duke Energy；REIT：领展/越秀/Simon Property/Realty Income；管线：Enbridge/Kinder Morgan。横向比 P/FFO + 派息率 + 监管回报。",
+    "incomparability_default": false
+  },
+
+  "modifier_flags_common": ["state_owned", "regulated_heavily", "a_h_dual_listed"],
+
+  "default_required_pct": 20,
+
+  "examples_in_samples": [
+    {"ticker": "0823.HK", "company_name": "领展房产基金", "fits_archetype": "true"},
+    {"ticker": "600900.SH", "company_name": "长江电力", "fits_archetype": "true"},
+    {"ticker": "NG", "company_name": "National Grid", "fits_archetype": "true"}
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "$schema": "value-invest-sector-extension-v2",
+  "applies_to_company_type": "banking",
+  "extension_purpose": "商业银行业务模式与一般工商企业截然不同：负债经营、利差驱动、资本监管约束严苛，传统 ROIC/FCF/三张表通用指标失效，必须以 NIM、不良率、拨备覆盖率、核充率为核心指标分析。",
+
+  "scorecard_extension": {
+    "_comment": "scorecard.json 在 banking 下应加载的额外评分子项",
+    "additional_dimensions": [
+      {
+        "name": "asset_quality",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "financial_quality",
+        "anchor_table": {
+          "0": "不良率 > 5% 且拨备覆盖率 < 100%，资产质量崩塌",
+          "3": "不良率 > 2%、拨备覆盖率 100-150%，资产质量明显恶化",
+          "5": "不良率 1.2-2%、拨备覆盖率 150-250%，行业平均",
+          "7": "不良率 0.9-1.2%、拨备覆盖率 250-400%，优秀",
+          "10": "不良率 < 0.9%、拨备覆盖率 > 400%，堡垒级（招行水准）"
+        }
+      },
+      {
+        "name": "capital_adequacy",
+        "weight_within_parent_dimension": "0.3",
+        "parent_dimension": "risk",
+        "anchor_table": {
+          "0": "核充率 < 监管红线，面临强制再融资或限制业务",
+          "3": "核充率刚过监管线 1pp 以内，缓冲极薄",
+          "5": "核充率 8.5-10%，达标但缓冲一般",
+          "7": "核充率 10-12%，稳健",
+          "10": "核充率 > 12%，资本充裕可逆周期扩张"
+        }
+      },
+      {
+        "name": "deposit_franchise",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "moat",
+        "anchor_table": {
+          "0": "无核心存款，依赖同业拆借/批发资金，负债成本极高",
+          "3": "活期存款占比 < 20%，负债成本高于同业平均",
+          "5": "活期存款占比 25-40%，负债成本中游",
+          "7": "活期存款占比 40-55%，零售存款占比 > 50%，负债成本低",
+          "10": "活期存款占比 > 55%，零售/AUM 双壁垒，负债成本结构性低（招行/JPM 水准）"
+        }
+      },
+      {
+        "name": "non_interest_income_quality",
+        "weight_within_parent_dimension": "0.3",
+        "parent_dimension": "business_quality",
+        "anchor_table": {
+          "0": "中收为零或全部一次性",
+          "3": "中收占比 < 15%，依赖息差",
+          "5": "中收占比 15-25%，财富管理萌芽",
+          "7": "中收占比 25-35%，财富管理稳健增长",
+          "10": "中收占比 > 35%，财富管理/投行/托管多轮驱动"
+        }
+      }
+    ]
+  },
+
+  "financial_fields_extension": {
+    "_comment": "structured-data.json 在 sector_extension.extension_data 下应填充的银行专属字段",
+    "fields": [
+      {"field_name": "nim_pct", "type": "number", "unit": "%", "description": "净息差 Net Interest Margin", "good_range": "> 2.0", "warning_range": "< 1.5"},
+      {"field_name": "npl_ratio_pct", "type": "number", "unit": "%", "description": "不良贷款率", "good_range": "< 1.2", "warning_range": "> 2.0"},
+      {"field_name": "provision_coverage_pct", "type": "number", "unit": "%", "description": "拨备覆盖率", "good_range": "> 250", "warning_range": "< 150"},
+      {"field_name": "car_total_pct", "type": "number", "unit": "%", "description": "资本充足率（总）", "good_range": "> 13", "warning_range": "< 11"},
+      {"field_name": "car_tier1_pct", "type": "number", "unit": "%", "description": "核心一级资本充足率", "good_range": "> 11", "warning_range": "< 9"},
+      {"field_name": "rwa", "type": "number", "unit": "亿元/百万USD", "description": "风险加权资产 Risk-Weighted Assets", "good_range": "稳定或缓增", "warning_range": "RWA 增速 > 总资产增速"},
+      {"field_name": "retail_loan_share_pct", "type": "number", "unit": "%", "description": "零售贷款占总贷款比例", "good_range": "> 50", "warning_range": "< 30"},
+      {"field_name": "non_interest_income_share_pct", "type": "number", "unit": "%", "description": "非息收入占比（中收占比）", "good_range": "> 30", "warning_range": "< 15"},
+      {"field_name": "aum_cny_bn", "type": "number", "unit": "十亿元", "description": "管理客户资产规模 AUM", "good_range": "持续增长", "warning_range": "停滞或下滑"},
+      {"field_name": "cost_to_income_ratio_pct", "type": "number", "unit": "%", "description": "成本收入比", "good_range": "< 35", "warning_range": "> 45"},
+      {"field_name": "demand_deposit_share_pct", "type": "number", "unit": "%", "description": "活期存款占比", "good_range": "> 45", "warning_range": "< 25"},
+      {"field_name": "roa_pct", "type": "number", "unit": "%", "description": "资产回报率 ROA（替代 ROIC）", "good_range": "> 1.0", "warning_range": "< 0.7"},
+      {"field_name": "roe_pct", "type": "number", "unit": "%", "description": "净资产收益率 ROE", "good_range": "> 15", "warning_range": "< 10"},
+      {"field_name": "loan_deposit_ratio_pct", "type": "number", "unit": "%", "description": "贷存比", "good_range": "65-80", "warning_range": "> 85 或 < 50"},
+      {"field_name": "loan_to_deposit_growth_diff_pp", "type": "number", "unit": "pp", "description": "贷款增速 - 存款增速", "good_range": "± 3pp 以内", "warning_range": "> 5pp"}
+    ]
+  },
+
+  "red_flags_na_rules": {
+    "_comment": "v1 32 项红旗清单中对 banking 不适用的项目，依据招商银行样本反馈",
+    "na_items": ["F1", "F2", "F3", "F4", "F5", "F6", "F8", "F9", "F12"],
+    "na_rationale": {
+      "F1": "经营现金流/净利润比对银行无意义：银行没有 OCF 概念，现金流量表项目与工商企业完全不同（存贷款扩张算投资/筹资）",
+      "F2": "应收账款占营收比对银行不适用：银行无应收账款主体科目，对应的是贷款资产",
+      "F3": "存货周转对银行不适用：银行无存货",
+      "F4": "毛利率对银行不适用：银行用 NIM 替代",
+      "F5": "ROIC < WACC 对银行不适用：资本结构特殊，监管资本约束，应改读 ROE 与权益成本对比",
+      "F6": "存贷双高对银行属于业务本质：银行就是吸存放贷，不构成红旗",
+      "F8": "应收账款增速 > 营收增速对银行不适用，改读贷款增速 vs 存款增速差",
+      "F9": "存货增速对银行不适用",
+      "F12": "应付账款占比对银行不适用，对应负债结构看存款结构"
+    },
+    "modified_rules": [
+      {"original": "F8 应收账款增速 > 营收增速", "modified": "BANK_MOD_F8 贷款增速 - 存款增速 > 5pp 持续两年，表明流动性紧张", "rationale": "银行无应收账款，对应的负债结构指标是存贷增速差"},
+      {"original": "F5 ROIC < WACC", "modified": "BANK_MOD_F5 ROE < 权益成本（约 10-12%）持续 3 年，毁灭股东价值", "rationale": "银行受资本监管，ROE 是更恰当的资本回报指标"}
+    ],
+    "new_sector_flags": [
+      {"flag_id": "BANK_F1", "description": "不良贷款率连续两年上升且 > 2%", "trigger_condition": "npl_ratio_pct_t > npl_ratio_pct_t-1 > npl_ratio_pct_t-2 AND npl_ratio_pct_t > 2.0"},
+      {"flag_id": "BANK_F2", "description": "拨备覆盖率跌破 150% 监管红线", "trigger_condition": "provision_coverage_pct < 150"},
+      {"flag_id": "BANK_F3", "description": "核心一级资本充足率 < 监管线 + 1pp（缓冲极薄）", "trigger_condition": "car_tier1_pct - regulatory_minimum < 1.0"},
+      {"flag_id": "BANK_F4", "description": "NIM 连续 3 年收窄且每年下降 > 10bp", "trigger_condition": "nim_pct 连续 3 年同比下降 10bp+"},
+      {"flag_id": "BANK_F5", "description": "关注类贷款大幅上升暗示不良迁徙", "trigger_condition": "special_mention_loan_ratio 同比上升 > 50bp"},
+      {"flag_id": "BANK_F6", "description": "成本收入比连续上升 > 45%", "trigger_condition": "cost_to_income_ratio_pct > 45 且同比上升"},
+      {"flag_id": "BANK_F7", "description": "同业负债/总负债 > 30%（依赖批发资金）", "trigger_condition": "interbank_liab_share > 30%"}
+    ]
+  },
+
+  "valuation_methods_priority": {
+    "primary": ["DDM", "PB-ROE", "FCFE", "RIM"],
+    "secondary": ["P/PPOP", "EV/AUM 对应零售/财富业务"],
+    "avoid": ["DCF-FCFF", "EV/EBITDA"],
+    "avoid_rationale": "银行无 FCFF 概念（无营运资本/资本支出含义），EBITDA 对负债经营银行无意义，必须用股权现金流（FCFE/DDM）或 PB-ROE 锚定"
+  },
+
+  "data_sources_required": [
+    {"source_name": "公司年报/季报", "url_pattern": "公司官网投资者关系 / 港交所披露易 / SEC EDGAR", "data_provided": "三表 + 资本充足率 + 不良 + 拨备"},
+    {"source_name": "央行/银保监会监管数据", "url_pattern": "cbirc.gov.cn / pbc.gov.cn / FDIC.gov", "data_provided": "行业平均 NIM/不良/拨备 / 监管最低要求"},
+    {"source_name": "Wind/Bloomberg/同花顺", "url_pattern": "终端", "data_provided": "同业对比 / 历史 PB/PE 分位"},
+    {"source_name": "管理层业绩说明会", "url_pattern": "公司业绩发布会回放", "data_provided": "前瞻指引 / 不良生成率 / 零售战略"}
+  ],
+
+  "peer_comparison_strategy": {
+    "ideal_peer_count": "3-5",
+    "peer_selection_rules": "选择同等业务模式（如零售银行选招行/平安/JPM/USB；对公选建行/工行/BAC/Wells；中小银行选宁波/上海/Regions）。境内外可混合但需标注监管制度差异。",
+    "incomparability_default": false
+  },
+
+  "modifier_flags_common": ["state_owned", "regulated_heavily", "a_h_dual_listed"],
+
+  "default_required_pct": 25,
+
+  "examples_in_samples": [
+    {"ticker": "600036.SH", "company_name": "招商银行", "fits_archetype": "true"},
+    {"ticker": "JPM", "company_name": "JPMorgan Chase", "fits_archetype": "true"},
+    {"ticker": "601398.SH", "company_name": "工商银行", "fits_archetype": "true"}
+  ]
+}
