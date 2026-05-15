@@ -1,0 +1,272 @@
+{
+  "$schema": "value-invest-scorecard-v2",
+  "meta": {
+    "ticker": "",
+    "company_name_cn": "",
+    "company_name_en": "",
+    "report_date": "",
+    "skill_version": "v2.0",
+    "primary_school": "buffett | graham | duan | zhang | mixed",
+    "skill_feedback": []
+  },
+  "company_classification": {
+    "_comment": "company_type 必须是 18 个枚举之一，与 V2_SPEC §二 锁定列表一致",
+    "company_type": "",
+    "company_type_enum": [
+      "great_company_compounder",
+      "tech_platform_network",
+      "consumer_brand_premium",
+      "tech_hardware_ecosystem",
+      "high_growth_platform",
+      "biotech_unprofitable",
+      "pharma_mature",
+      "banking",
+      "insurance",
+      "brokerage_assetmgmt",
+      "utility_infrastructure_reit",
+      "cyclical_commodity",
+      "cyclical_industrial_ev",
+      "real_estate",
+      "holding_conglomerate",
+      "distressed_turnaround",
+      "declining_cash_cow",
+      "cigarbutt_deep_value"
+    ],
+    "modifier_flags": [],
+    "modifier_flags_enum": [
+      "with_policy_support",
+      "distressed",
+      "a_h_dual_listed",
+      "vie_structure",
+      "adr_listed",
+      "dual_primary_listing",
+      "creator_led",
+      "state_owned",
+      "regulated_heavily",
+      "pcaob_risk"
+    ],
+    "rationale": ""
+  },
+  "dimension_anchors": {
+    "_comment": "强制内置完整 6 维锚点表，每个 score 必须配 anchor_used 字段说明所用锚点",
+    "business_quality": {
+      "weight": 0.20,
+      "anchors": [
+        {"score": 0,  "description": "明确造假 / 烂生意 / 即将归零",                     "example": "教培被监管归零"},
+        {"score": 3,  "description": "普通竞争激烈 / 无定价权 / 低质增长",               "example": "普通家电制造、低端零售"},
+        {"score": 5,  "description": "平凡但稳定 / 有一定市场地位",                       "example": "中游制造业龙头"},
+        {"score": 7,  "description": "好生意有壁垒 / 长期回报合理 / 可预测现金流",        "example": "苹果、比亚迪"},
+        {"score": 10, "description": "极致复利机器（最高分）",                             "example": "茅台 / 可口可乐 / Visa / Moody's"}
+      ]
+    },
+    "management": {
+      "weight": 0.15,
+      "anchors": [
+        {"score": 0,  "description": "造假 / 关联输送 / 毁灭股东价值",         "example": "已立案造假案"},
+        {"score": 3,  "description": "能力或诚信存疑 / 信息披露严重不足",       "example": "拼多多治理透明度问题"},
+        {"score": 5,  "description": "平稳称职 / 中规中矩",                     "example": "多数国企平均水平"},
+        {"score": 7,  "description": "优秀资本配置者 / 长期主义",               "example": "库克、马化腾"},
+        {"score": 10, "description": "巴菲特级",                                  "example": "巴菲特、芒格"}
+      ]
+    },
+    "moat": {
+      "weight": 0.20,
+      "anchors": [
+        {"score": 0,  "description": "无壁垒 / 红海竞争",                  "example": "部分中小制造业"},
+        {"score": 3,  "description": "有壁垒但持续收窄 / 单一来源",         "example": "平庸消费品"},
+        {"score": 5,  "description": "稳定护城河 / 一种来源",                "example": "中等品牌"},
+        {"score": 7,  "description": "宽护城河 / 多来源",                   "example": "苹果、招行"},
+        {"score": 10, "description": "多重壁垒持续变宽",                     "example": "茅台（品牌+稀缺）、腾讯（网络+切换+生态）"}
+      ]
+    },
+    "financial_quality": {
+      "weight": 0.15,
+      "anchors": [
+        {"score": 0,  "description": "明显造假 / 即将崩溃",                                 "example": "财务造假已暴露"},
+        {"score": 3,  "description": "持续疲软 / 多个红旗 / 一票否决预警",                  "example": "万科当前 / 百济未盈利"},
+        {"score": 5,  "description": "稳健 / 合规 / 无明显红旗",                            "example": "多数中规中矩公司"},
+        {"score": 7,  "description": "优秀质量 / FCF > 净利润 / 低负债",                    "example": "招行、比亚迪"},
+        {"score": 10, "description": "堡垒级现金流（最高分）",                               "example": "茅台、苹果、Visa"}
+      ]
+    },
+    "valuation_margin_of_safety": {
+      "weight": 0.20,
+      "anchors": [
+        {"score": 0,  "description": "≥ 2 倍内在价值（严重高估）"},
+        {"score": 3,  "description": "10-30% 溢价（贵）"},
+        {"score": 5,  "description": "公允价附近（±10%）"},
+        {"score": 7,  "description": "20-40% 折价（便宜）"},
+        {"score": 10, "description": "≥ 50% 折价（深度低估）"}
+      ]
+    },
+    "risk": {
+      "weight": 0.10,
+      "anchors": [
+        {"score": 0,  "description": "已存在重大致命单点风险",       "example": "监管立案、关键人物突逝、客户崩盘"},
+        {"score": 3,  "description": "多个重大风险并存",             "example": "万科 = 2 / 拼多多 = 5"},
+        {"score": 5,  "description": "可控",                          "example": "多数公司"},
+        {"score": 7,  "description": "低风险",                        "example": "招行"},
+        {"score": 10, "description": "反脆弱（黑天鹅有利或免疫）",     "example": "罕见"}
+      ]
+    }
+  },
+  "scorecard": {
+    "business_quality": {
+      "score": null,
+      "evidence": [],
+      "anchor_used": "",
+      "report_anchor": "#1-公司速描与商业模式理解生意"
+    },
+    "management": {
+      "score": null,
+      "evidence": [],
+      "anchor_used": "",
+      "report_anchor": "#2-管理层评估"
+    },
+    "moat": {
+      "score": null,
+      "evidence": [],
+      "anchor_used": "",
+      "report_anchor": "#3-护城河分析"
+    },
+    "financial_quality": {
+      "score": null,
+      "evidence": [],
+      "anchor_used": "",
+      "report_anchor": "#4-财务质量诊断"
+    },
+    "valuation_margin_of_safety": {
+      "score": null,
+      "evidence": [],
+      "anchor_used": "",
+      "report_anchor": "#5-估值"
+    },
+    "risk": {
+      "score": null,
+      "evidence": [],
+      "anchor_used": "",
+      "report_anchor": "#6-风险与反偏差强制章节"
+    }
+  },
+  "computed": {
+    "quality_score": {
+      "value": null,
+      "_comment": "quality_score = (business_quality + management + moat + financial_quality + risk) / 5"
+    },
+    "valuation_score": {
+      "value": null,
+      "_comment": "valuation_score = valuation_margin_of_safety.score"
+    },
+    "weighted_total": {
+      "value": null,
+      "_comment": "weighted_total = 0.20*biz + 0.15*mgmt + 0.20*moat + 0.15*fin + 0.20*val + 0.10*risk — 仅作参考字段，不再作为决策依据"
+    }
+  },
+  "veto_check": {
+    "_comment": "一票否决独立于决策矩阵，触发任一即强制 PASS",
+    "any_dimension_le_3": false,
+    "vetoed_dimensions": [],
+    "circle_of_competence_too_hard": false,
+    "value_trap_signals_triggered": 0,
+    "value_trap_threshold": "value_trap_signals_triggered >= 5 → 强制 PASS"
+  },
+  "decision": {
+    "_comment": "v2：二维决策矩阵（V2_SPEC §五），废除 weighted_total ≥ 8.0 单一门槛",
+    "rating": null,
+    "rating_enum": [
+      "heavy_buy_candidate",
+      "wishlist_quality_company",
+      "wishlist_overvalued",
+      "watchlist_buildable",
+      "watchlist_quality_only",
+      "pass"
+    ],
+    "decision_matrix": [
+      {"quality_score": ">= 8.0", "valuation_score": ">= 7.0",   "rating": "heavy_buy_candidate",       "meaning": "重仓候选"},
+      {"quality_score": ">= 8.0", "valuation_score": "5.0-7.0",  "rating": "wishlist_quality_company",  "meaning": "心仪公司池（好公司，等价格）"},
+      {"quality_score": ">= 8.0", "valuation_score": "< 5.0",    "rating": "wishlist_overvalued",       "meaning": "心仪公司池（明显高估）"},
+      {"quality_score": "6.5-8.0","valuation_score": ">= 7.0",   "rating": "watchlist_buildable",       "meaning": "观察清单可分批建仓"},
+      {"quality_score": "6.5-8.0","valuation_score": "< 7.0",    "rating": "watchlist_quality_only",    "meaning": "观察清单（仅质量过关）"},
+      {"quality_score": "< 6.5",  "valuation_score": "any",      "rating": "pass",                       "meaning": "PASS"}
+    ],
+    "rationale": "",
+    "suggested_position_pct_range": [null, null]
+  },
+  "value_range": {
+    "currency": "",
+    "ranges_by_method": [
+      {"method": "DCF",    "low": null, "base": null, "high": null, "notes": ""},
+      {"method": "PB-ROE", "low": null, "base": null, "high": null, "notes": ""}
+    ],
+    "consensus_range": {
+      "low": null,
+      "high": null,
+      "_comment": "跨方法综合后的内在价值区间"
+    }
+  },
+  "margin_of_safety": {
+    "_comment": "required_pct = base_by_type + adjustment + modifier_adjustment（V2_SPEC §六）",
+    "required_pct": null,
+    "required_pct_breakdown": {
+      "base": null,
+      "base_source": "base_by_type[company_type] — 见 V2_SPEC §六 表",
+      "adjustment": null,
+      "adjustment_source": "quality_score >= 8.0 → -5；quality_score < 6.0 → +10；else 0",
+      "modifier_adjustment": null,
+      "modifier_adjustment_source": "distressed +10 / vie_structure +5 / pcaob_risk +5 / regulated_heavily +3"
+    },
+    "actual_pct": null,
+    "meets_requirement": null
+  },
+  "red_flags": {
+    "red_count": 0,
+    "yellow_count": 0,
+    "green_count": 0,
+    "na_count": 0,
+    "na_reason": "依据 sector_extension 中规则（如 banking 不适用 ROIC / FCF 红旗）",
+    "critical_flags": []
+  },
+  "sector_extension": {
+    "_comment": "按 company_type 加载对应行业扩展字段；若该 type 无 schema_extension 则 $ref 为 null 且 extension_data 为空对象",
+    "$ref": "templates/schema_extensions/{company_type}.json",
+    "extension_data": {}
+  },
+  "tracking_metrics": {
+    "business_logic": [],
+    "financial": [],
+    "valuation": [],
+    "price_triggers": {
+      "add_below": null,
+      "trim_above": null,
+      "exit_above": null
+    }
+  },
+  "sell_triggers": {
+    "logic_invalidation": [],
+    "management_breach": [],
+    "valuation_extreme": [],
+    "opportunity_cost": []
+  },
+  "quality_gate": {
+    "_comment": "v2：硬门控 5 项 + 软门控 6 项。硬门控未通过 → mode 强制 unverified_quick_look + output_downgraded = true",
+    "mode": null,
+    "mode_enum": ["full", "quick_look", "unverified_quick_look"],
+    "hard_gates_passed": {
+      "H1_data_freshness_ok": false,
+      "H2_sources_cited": false,
+      "H3_circle_of_competence_declared": false,
+      "H4_no_deterministic_buy_sell": false,
+      "H5_red_flag_checklist_done": false
+    },
+    "soft_gates_passed": {
+      "S1_reverse_evidence_done": false,
+      "S2_premortem_done": false,
+      "S3_all_dimensions_scored": false,
+      "S4_dcf_sensitivity_done": false,
+      "S5_peer_comparison_done": false,
+      "S6_ah_dual_listing_handled": false
+    },
+    "output_downgraded": false,
+    "downgrade_reasons": []
+  }
+}

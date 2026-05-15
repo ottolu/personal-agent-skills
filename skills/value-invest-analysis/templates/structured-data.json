@@ -1,0 +1,156 @@
+{
+  "$schema": "value-invest-structured-data-v2",
+  "meta": {
+    "ticker": "",
+    "company_name_cn": "",
+    "company_name_en": "",
+    "market": "",
+    "currency_reporting": "",
+    "currency_listing": "",
+    "fiscal_year_end": "12-31",
+    "report_date": "",
+    "data_as_of": "",
+    "skill_version": "v2.0"
+  },
+  "company_classification": {
+    "_comment": "与 scorecard.json 的 company_classification 保持一致",
+    "company_type": "",
+    "modifier_flags": [],
+    "rationale": ""
+  },
+  "price_snapshot": {
+    "price": null,
+    "market_cap": null,
+    "enterprise_value": null,
+    "shares_outstanding": null,
+    "free_float_pct": null,
+    "as_of": ""
+  },
+  "annual_financials": {
+    "_comment": "近 10 年数据，每个字段是按年份的数组。可省略未取到的年份。",
+    "years": [],
+    "revenue": [],
+    "gross_profit": [],
+    "operating_income": [],
+    "net_income": [],
+    "operating_cashflow": [],
+    "capex": [],
+    "free_cashflow": [],
+    "total_assets": [],
+    "total_equity": [],
+    "interest_bearing_debt": [],
+    "cash_and_equivalents": [],
+    "goodwill": [],
+    "shares_outstanding": [],
+    "dividends_paid": [],
+    "buybacks": []
+  },
+  "derived_metrics": {
+    "_comment": "由 annual_financials 计算得出（部分指标在某些 company_type 下不适用，按 sector_extension 替换）",
+    "gross_margin_pct": [],
+    "operating_margin_pct": [],
+    "net_margin_pct": [],
+    "roe_pct": [],
+    "roic_pct": [],
+    "fcf_to_ni_ratio": [],
+    "revenue_cagr_5y_pct": null,
+    "revenue_cagr_10y_pct": null,
+    "ni_cagr_5y_pct": null,
+    "debt_to_equity_pct": [],
+    "interest_coverage": [],
+    "current_ratio": [],
+    "dividend_payout_pct": []
+  },
+  "valuation": {
+    "current_multiples": {
+      "pe_ttm": null,
+      "pe_forward": null,
+      "pb": null,
+      "ps": null,
+      "ev_ebitda": null,
+      "dividend_yield_pct": null
+    },
+    "historical_multiples_percentile": {
+      "pe_5y_percentile": null,
+      "pe_10y_percentile": null,
+      "pb_5y_percentile": null
+    },
+    "dcf_assumptions": {
+      "wacc_pct": null,
+      "risk_free_rate_pct": null,
+      "equity_risk_premium_pct": null,
+      "beta": null,
+      "explicit_period_years": 10,
+      "explicit_growth_pct": [],
+      "fade_growth_pct": null,
+      "terminal_growth_pct": null,
+      "terminal_value_share_pct": null
+    },
+    "dcf_output": {
+      "intrinsic_value_per_share_low": null,
+      "intrinsic_value_per_share_base": null,
+      "intrinsic_value_per_share_high": null,
+      "currency": ""
+    },
+    "scenarios": {
+      "bull": {"probability": null, "value_per_share": null},
+      "base": {"probability": null, "value_per_share": null},
+      "bear": {"probability": null, "value_per_share": null},
+      "expected_value": null
+    },
+    "implied_growth_reverse_dcf": {
+      "implied_long_term_growth_pct": null,
+      "reasonable": null
+    }
+  },
+  "moat_assessment": {
+    "moat_types_present": [],
+    "moat_width_score": null,
+    "moat_depth_score": null,
+    "moat_durability_score": null,
+    "moat_expandability_score": null,
+    "moat_overall": ""
+  },
+  "red_flags": {
+    "financial": {
+      "F1_ocf_ni_ratio_low": null,
+      "F6_cash_debt_dual_high": null,
+      "F7_goodwill_to_equity_high": null,
+      "F8_ar_growth_exceeds_revenue": null
+    },
+    "governance": {
+      "G1_auditor_change": null,
+      "G3_pledge_ratio_high": null,
+      "G4_insider_selling": null,
+      "G6_investigation": null
+    },
+    "market_specific": {}
+  },
+  "peers": [
+    {
+      "ticker": "",
+      "name": "",
+      "market": "",
+      "rationale_for_inclusion": "",
+      "key_metrics": {}
+    }
+  ],
+  "sector_extension": {
+    "_comment": "v2 新增：按 company_type 加载行业专属字段集。若该 type 无 schema_extension 则 $ref 为 null。",
+    "$ref": "templates/schema_extensions/{company_type}.json",
+    "extension_data": {}
+  },
+  "data_lineage": [
+    {
+      "_comment": "v2 新增：每个定量数据点必须有完整溯源（source / url / fetched_at / freshness_days）",
+      "field": "annual_financials.revenue",
+      "source": "",
+      "url": "",
+      "fetched_at": "",
+      "freshness_days": null
+    }
+  ],
+  "data_sources": [
+    {"item": "", "source": "", "url": "", "fetched_at": ""}
+  ]
+}

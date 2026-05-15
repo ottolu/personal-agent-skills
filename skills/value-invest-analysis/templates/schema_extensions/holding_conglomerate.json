@@ -1,0 +1,142 @@
+{
+  "$schema": "value-invest-sector-extension-v2",
+  "applies_to_company_type": "holding_conglomerate",
+  "extension_purpose": "控股集团（如伯克希尔、Markel）由保险浮存金 + 公开股票组合 + 全资控股子公司 + 现金构成，整体 PE/EBITDA 完全无意义。必须用 SOTP（分部估值加总）法，并考虑控股折价、浮存金成本、CEO 资本配置能力。",
+
+  "scorecard_extension": {
+    "additional_dimensions": [
+      {
+        "name": "capital_allocator_quality",
+        "weight_within_parent_dimension": "0.6",
+        "parent_dimension": "management",
+        "anchor_table": {
+          "0": "CEO 屡次烧钱并购毁损价值",
+          "3": "资本配置中性，并购回报与市场基准接近",
+          "5": "资本配置合格，少数成功案例",
+          "7": "长期跑赢基准 200bp 以上，有方法论",
+          "10": "巴菲特/芒格/Tom Gayner 级资本配置者，长期跑赢标普 > 500bp"
+        }
+      },
+      {
+        "name": "float_quality",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "moat",
+        "anchor_table": {
+          "0": "浮存金成本 > 5%（高成本资金）或浮存金萎缩",
+          "3": "浮存金微正成本，规模平稳",
+          "5": "浮存金接近零成本，规模缓慢增长",
+          "7": "浮存金长期负成本 -1% 到 -3%，规模增长 5-10%",
+          "10": "浮存金长期深度负成本 < -3%，规模长期复合增长（BRK 水准）"
+        }
+      },
+      {
+        "name": "sotp_transparency",
+        "weight_within_parent_dimension": "0.3",
+        "parent_dimension": "financial_quality",
+        "anchor_table": {
+          "0": "分部信息严重不足，无法 SOTP",
+          "3": "分部信息粗糙，需要大量假设",
+          "5": "分部数据基本可读，主要部分能估算",
+          "7": "披露细致，分部 PnL/资本占用清晰",
+          "10": "披露媲美独立公司年报，附详细 SOTP 表"
+        }
+      }
+    ]
+  },
+
+  "financial_fields_extension": {
+    "fields": [
+      {
+        "field_name": "segment_data",
+        "type": "array",
+        "unit": "object[]",
+        "description": "分部数据 [{segment_name, segment_type: 'insurance|wholly_owned_sub|public_equity|cash_and_treasuries|other', revenue, op_income, capital_employed, key_kpis}]"
+      },
+      {
+        "field_name": "sotp_valuation",
+        "type": "object",
+        "unit": "object",
+        "description": "Sum-of-the-parts 估值表",
+        "structure": {
+          "insurance_book_plus_float": {"value_cny_bn": "number", "method": "PB-ROE 或 EV+NBV"},
+          "public_equity_portfolio_at_market": {"value_cny_bn": "number", "method": "市价 (mark-to-market)"},
+          "wholly_owned_subs_value": {"value_cny_bn": "number", "method": "EBIT × multiple 或 DCF 单项加总"},
+          "cash_and_treasuries": {"value_cny_bn": "number", "method": "面值"},
+          "other_assets": {"value_cny_bn": "number", "method": "..."},
+          "minus_corporate_overhead": {"value_cny_bn": "number", "method": "总部费用资本化"},
+          "minus_pension_underfunding": {"value_cny_bn": "number", "method": "精算"},
+          "sotp_total": {"value_cny_bn": "number"},
+          "sotp_per_share": {"value_per_share": "number"},
+          "holdco_discount_applied_pct": {"value": "number", "rationale": "string"}
+        }
+      },
+      {"field_name": "float_value_cny_bn", "type": "number", "unit": "十亿元", "description": "保险浮存金总额"},
+      {"field_name": "float_cost_pct", "type": "number", "unit": "%", "description": "浮存金成本率（负值表示承保盈利 = 免费杠杆）", "good_range": "< 0", "warning_range": "> 3"},
+      {"field_name": "investment_portfolio_top10", "type": "array", "unit": "object[]", "description": "公开市场股票组合前 10 大持仓 [{ticker, position_value, cost_basis, weight_pct}]"},
+      {"field_name": "investment_portfolio_total_value", "type": "number", "unit": "十亿元", "description": "公开市场股票组合市值"},
+      {"field_name": "holdco_discount_pct", "type": "number", "unit": "%", "description": "控股折价 = (SOTP - 市值) / SOTP", "good_range": "< 10%（小折价或溢价）", "warning_range": "> 30%（市场不信任）"},
+      {"field_name": "buyback_history_cny_bn", "type": "array", "unit": "object[]", "description": "近 10 年回购历史 [{year, amount, avg_price, premium_to_pb}]"},
+      {"field_name": "cumulative_returns_vs_benchmark", "type": "object", "unit": "object", "description": "长期跑赢基准 {period_10y_cagr_pct, benchmark_cagr_pct, excess_return_bp}"},
+      {"field_name": "key_person_age", "type": "number", "unit": "岁", "description": "核心 CEO 年龄（继承计划关键）"},
+      {"field_name": "succession_plan_clarity", "type": "string", "unit": "enum", "description": "继承计划清晰度：'clear|moderate|unclear'"}
+    ]
+  },
+
+  "red_flags_na_rules": {
+    "na_items": ["F1", "F2", "F3", "F4", "F5", "F6", "F8", "F9", "F10"],
+    "na_rationale": {
+      "F1": "控股集团 OCF 与净利润不可比：包含保险准备金计提、投资浮亏浮盈",
+      "F2": "无统一应收账款指标，需看各分部",
+      "F3": "存货指标不适用",
+      "F4": "毛利率对综合集团无意义",
+      "F5": "ROIC 算法对综合集团失真，应看分部资本回报",
+      "F6": "持有大量保险浮存金现金 + 投资资产是业务本质",
+      "F8": "应收账款集团合并意义不大",
+      "F9": "存货指标不适用",
+      "F10": "EBITDA 倍数对集团整体无意义"
+    },
+    "modified_rules": [
+      {"original": "F5 ROIC < WACC", "modified": "HC_MOD_F5 BVPS 增速 + 派息率 < 10% 长期", "rationale": "综合集团看每股账面价值增速 + 股息（BRK 的标准）"},
+      {"original": "F11 商誉过高", "modified": "HC_MOD_F11 商誉占股东权益 > 50% 且并购回报 ROIC < 8%", "rationale": "控股集团本身就是并购出身，需看商誉对应的现金流回报"}
+    ],
+    "new_sector_flags": [
+      {"flag_id": "HC_F1", "description": "浮存金成本由负转正且超过 3%", "trigger_condition": "float_cost_pct > 3"},
+      {"flag_id": "HC_F2", "description": "BVPS 增速 < 通胀 + 长期国债收益率（毁灭股东价值）", "trigger_condition": "bvps_cagr_5y < (cpi + 10y_treasury_yield)"},
+      {"flag_id": "HC_F3", "description": "回购溢价过高（回购价 > 1.5x PB）", "trigger_condition": "buyback_avg_premium_to_pb > 1.5"},
+      {"flag_id": "HC_F4", "description": "核心人物年龄 > 90 且无清晰继承计划", "trigger_condition": "key_person_age > 90 AND succession_plan_clarity == 'unclear'"},
+      {"flag_id": "HC_F5", "description": "分部信息劣化导致 SOTP 不可估算", "trigger_condition": "sotp_transparency_score <= 3"},
+      {"flag_id": "HC_F6", "description": "现金长期占总资产 > 25% 且无并购出手（资本配置闲置）", "trigger_condition": "cash_share > 25% 持续 3 年"}
+    ]
+  },
+
+  "valuation_methods_priority": {
+    "primary": ["SOTP (Sum-of-the-parts)"],
+    "secondary": ["PB-book_value (with float adjustment)", "Look-through earnings (公开股票按比例并表收益)"],
+    "avoid": ["DCF-FCFF", "单一 PE", "EV/EBITDA"],
+    "avoid_rationale": "控股集团是异构业务组合，整体现金流口径混乱（保险准备金 + 投资浮盈 + 子公司盈利），必须分部估值再加总，否则失真"
+  },
+
+  "data_sources_required": [
+    {"source_name": "致股东信", "url_pattern": "公司官网 IR", "data_provided": "CEO 资本配置思路 / BVPS 增速 / 自我打分"},
+    {"source_name": "10-K / 年报分部信息", "url_pattern": "SEC EDGAR", "data_provided": "分部 PnL / 资本占用 / 保险浮存金 / 投资组合"},
+    {"source_name": "13F 持仓披露", "url_pattern": "sec.gov/cgi-bin/browse-edgar", "data_provided": "公开市场股票组合明细"},
+    {"source_name": "并购历史与回购公告", "url_pattern": "8-K / 公告", "data_provided": "并购价 / 回购价 / 时点"},
+    {"source_name": "保险分部偿付能力报告", "url_pattern": "NAIC / 监管文件", "data_provided": "保险子公司财务"}
+  ],
+
+  "peer_comparison_strategy": {
+    "ideal_peer_count": "single_in_kind",
+    "peer_selection_rules": "真正可比的控股集团稀少：BRK.B / Markel / Fairfax / 复星国际 / 长江和记。控股集团之间差异大，常需独立 SOTP + 历史 PB 分位自比；可加 incomparability_flag。",
+    "incomparability_default": true
+  },
+
+  "modifier_flags_common": ["creator_led", "a_h_dual_listed"],
+
+  "default_required_pct": 20,
+
+  "examples_in_samples": [
+    {"ticker": "BRK.B", "company_name": "伯克希尔哈撒韦", "fits_archetype": "true"},
+    {"ticker": "MKL", "company_name": "Markel", "fits_archetype": "true"},
+    {"ticker": "0656.HK", "company_name": "复星国际", "fits_archetype": "true"}
+  ]
+}

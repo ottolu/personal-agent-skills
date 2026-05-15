@@ -1,0 +1,133 @@
+{
+  "$schema": "value-invest-sector-extension-v2",
+  "applies_to_company_type": "biotech_unprofitable",
+  "extension_purpose": "未盈利创新药企无 PE/PEG/FCF 可言，价值来自管线期权与里程碑兑现。必须以现金跑道、研发效率、管线阶段、SBC 占比和 rNPV 估值为核心，禁用工商企业通用指标。",
+
+  "scorecard_extension": {
+    "additional_dimensions": [
+      {
+        "name": "pipeline_depth_quality",
+        "weight_within_parent_dimension": "0.5",
+        "parent_dimension": "business_quality",
+        "anchor_table": {
+          "0": "管线已折戟或仅 1 个早期项目",
+          "3": "1-2 个临床 II 期项目，无 III 期，无 first-in-class/best-in-class",
+          "5": "3-5 个项目分布 I-II 期，1 个临床 III 期",
+          "7": "5-10 个项目，多个临床 III 期 + 已上市药，FIC/BIC 多于 2 个",
+          "10": "10+ 项目梯队完整，多个上市重磅药 + 多个 III 期 + 国际化授权大单"
+        }
+      },
+      {
+        "name": "cash_runway_safety",
+        "weight_within_parent_dimension": "0.6",
+        "parent_dimension": "risk",
+        "anchor_table": {
+          "0": "现金跑道 < 6 个月，被迫破产/低价增发",
+          "3": "现金跑道 6-12 个月，需近期融资",
+          "5": "现金跑道 12-24 个月，能撑到下一里程碑",
+          "7": "现金跑道 24-36 个月，从容",
+          "10": "现金跑道 > 36 个月 或 已能依靠商业化产品自给"
+        }
+      },
+      {
+        "name": "rd_efficiency_track_record",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "management",
+        "anchor_table": {
+          "0": "研发屡战屡败 / 临床数据屡次造假被警告",
+          "3": "管线推进缓慢，几次主要终点失败",
+          "5": "正常推进，命中率与行业平均相当",
+          "7": "多次 first-in-class 突破，临床读数稳健",
+          "10": "公认 R&D engine（百济/Vertex/Regeneron 水准）"
+        }
+      },
+      {
+        "name": "dilution_sbc_quality",
+        "weight_within_parent_dimension": "0.4",
+        "parent_dimension": "financial_quality",
+        "anchor_table": {
+          "0": "年股本稀释 > 20%，SBC/营收 > 50%",
+          "3": "年稀释 10-20%，SBC/营收 30-50%",
+          "5": "年稀释 5-10%，SBC/营收 15-30%",
+          "7": "年稀释 < 5%，SBC/营收 < 15%",
+          "10": "已停止稀释甚至回购，SBC 占比低"
+        }
+      }
+    ]
+  },
+
+  "financial_fields_extension": {
+    "fields": [
+      {"field_name": "cash_runway_months", "type": "number", "unit": "月", "description": "现金跑道 = 期末现金 / 月均经营+投资现金流出", "good_range": "> 24", "warning_range": "< 12"},
+      {"field_name": "rd_expense_cny_bn", "type": "number", "unit": "十亿元", "description": "研发费用"},
+      {"field_name": "rd_expense_to_revenue_ratio", "type": "number", "unit": "x", "description": "研发费用/营收", "good_range": "< 1.0（接近商业化）", "warning_range": "> 5（高烧钱）"},
+      {"field_name": "rd_efficiency", "type": "number", "unit": "元营收/元研发", "description": "每元研发产生的销售额（滚动 3 年），衡量研发产出"},
+      {"field_name": "sbc_cny_bn", "type": "number", "unit": "十亿元", "description": "股权激励费用 SBC"},
+      {"field_name": "sbc_to_revenue_ratio", "type": "number", "unit": "x", "description": "SBC/营收，biotech 真实成本关键指标", "good_range": "< 0.15", "warning_range": "> 0.50"},
+      {"field_name": "pipeline_phases", "type": "array", "unit": "object[]", "description": "管线列表 [{drug_name, indication, phase, expected_milestone_date, geography}]"},
+      {"field_name": "approved_drugs_count", "type": "number", "unit": "个", "description": "已获批商业化药品数量"},
+      {"field_name": "key_partnerships_value_usd_mn", "type": "number", "unit": "百万美元", "description": "已签订对外授权/合作交易总潜在价值（含里程碑）"},
+      {"field_name": "cumulative_loss_cny_bn", "type": "number", "unit": "十亿元", "description": "累计未弥补亏损"},
+      {"field_name": "price_to_sales_ttm", "type": "number", "unit": "x", "description": "P/S（市销率，TTM），未盈利期主要估值锚"},
+      {"field_name": "peak_sales_potential_by_drug", "type": "array", "unit": "object[]", "description": "[{drug_name, peak_sales_usd_bn_estimate, peak_year_estimate, prob_of_success_pct}]"},
+      {"field_name": "share_dilution_yoy_pct", "type": "number", "unit": "%", "description": "总股本同比稀释率", "good_range": "< 5", "warning_range": "> 15"},
+      {"field_name": "fda_milestones_next_12m", "type": "array", "unit": "object[]", "description": "未来 12 月 FDA/NMPA/EMA 里程碑 [{drug, milestone, expected_date}]"}
+    ]
+  },
+
+  "red_flags_na_rules": {
+    "na_items": ["F1", "F2", "F4", "F5", "F6", "F10"],
+    "na_rationale": {
+      "F1": "未盈利公司净利润为负，OCF/净利润比无意义",
+      "F2": "biotech 商业化前应收账款极小，占比指标无意义",
+      "F4": "未盈利无毛利率讨论意义（或商业化早期毛利波动巨大）",
+      "F5": "ROIC 对未盈利公司无意义，资本回报为负是常态",
+      "F6": "biotech 高现金 + 高研发投入是业务本质（IPO 募资留存），不构成红旗",
+      "F10": "EBITDA 为负，相关倍数无意义"
+    },
+    "modified_rules": [
+      {"original": "F5 ROIC < WACC", "modified": "BIOTECH_MOD_F5 R&D 累计投入 vs 已上市药峰值销售比 < 1（研发产出效率低）", "rationale": "未盈利期看研发兑现能力"},
+      {"original": "F11 商誉占净资产 > 30%", "modified": "BIOTECH_MOD_F11 通过授权/并购管线占总管线 > 60% 且自研管线推进缓慢", "rationale": "biotech 商誉来自管线收购"}
+    ],
+    "new_sector_flags": [
+      {"flag_id": "BIO_F1", "description": "现金跑道 < 12 个月且无明确融资计划", "trigger_condition": "cash_runway_months < 12 AND no_announced_financing"},
+      {"flag_id": "BIO_F2", "description": "关键管线临床 III 期主终点失败", "trigger_condition": "phase_3_primary_endpoint_failed = true"},
+      {"flag_id": "BIO_F3", "description": "年稀释率 > 15% 持续两年", "trigger_condition": "share_dilution_yoy_pct > 15 连续两年"},
+      {"flag_id": "BIO_F4", "description": "SBC/营收 > 50%（伪利润）", "trigger_condition": "sbc_to_revenue_ratio > 0.5"},
+      {"flag_id": "BIO_F5", "description": "核心管线监管推迟或被发出 CRL", "trigger_condition": "FDA CRL OR NMPA 退审"},
+      {"flag_id": "BIO_F6", "description": "核心科学家 / CMO 突然离职", "trigger_condition": "key_scientist_departure = true"},
+      {"flag_id": "BIO_F7", "description": "授权合作伙伴终止合作并退回权益", "trigger_condition": "partnership_terminated = true"}
+    ]
+  },
+
+  "valuation_methods_priority": {
+    "primary": ["rNPV (risk-adjusted NPV per asset)", "EV/Sales", "EV/peak sales", "real options"],
+    "secondary": ["管线 SOTP（按阶段折价后加总）", "可比交易倍数（last licensing deal）"],
+    "avoid": ["DCF-FCFF", "PE", "PEG", "EV/EBITDA"],
+    "avoid_rationale": "未盈利公司无 E/EBITDA/FCF，DCF 需 20+ 年外推不稳健。必须用按概率加权的管线 rNPV 或 EV/peak sales 倍数法"
+  },
+
+  "data_sources_required": [
+    {"source_name": "ClinicalTrials.gov / 国家药监局药物临床试验登记平台", "url_pattern": "clinicaltrials.gov / chinadrugtrials.org.cn", "data_provided": "管线临床阶段 / 入组 / 终点 / 里程碑"},
+    {"source_name": "FDA / NMPA / EMA / PMDA 审评数据库", "url_pattern": "fda.gov / nmpa.gov.cn", "data_provided": "审评进度 / 批准状态 / CRL"},
+    {"source_name": "公司年报/季报", "url_pattern": "SEC EDGAR / HKEX 披露易", "data_provided": "现金 / 研发支出 / SBC / 合作交易"},
+    {"source_name": "EvaluatePharma / Cortellis", "url_pattern": "付费数据库", "data_provided": "peak sales 共识预测 / 同类对比交易"},
+    {"source_name": "管理层电话会 / R&D Day", "url_pattern": "公司官网 IR", "data_provided": "管线推进时间表 / 战略转向"}
+  ],
+
+  "peer_comparison_strategy": {
+    "ideal_peer_count": "flexible",
+    "peer_selection_rules": "按治疗领域 + 阶段配对：抗肿瘤选百济/信达/Arcus；mRNA 选 Moderna/BioNTech；ADC 选 Daiichi Sankyo/科伦/荣昌；基因治疗选 Bluebird/Sarepta。商业化前段 EV/peak sales 倍数；商业化后段 EV/Sales。",
+    "incomparability_default": false
+  },
+
+  "modifier_flags_common": ["a_h_dual_listed", "dual_primary_listing", "adr_listed", "vie_structure"],
+
+  "default_required_pct": 50,
+
+  "examples_in_samples": [
+    {"ticker": "6160.HK", "company_name": "百济神州", "fits_archetype": "true"},
+    {"ticker": "MRNA", "company_name": "Moderna", "fits_archetype": "true"},
+    {"ticker": "1801.HK", "company_name": "信达生物", "fits_archetype": "true"}
+  ]
+}
