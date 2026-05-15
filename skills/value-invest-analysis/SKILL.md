@@ -1,6 +1,6 @@
 ---
 name: value-invest-analysis
-description: 价值投资深度分析框架。当用户请求对个股进行基本面分析、护城河评估、DCF/相对估值、财务质量诊断、商业模式拆解、管理层评估、安全边际测算、买入卖出决策、行业对比、价值陷阱识别、深度研报时使用。覆盖 A股（.SH/.SZ/.BJ）、港股（.HK）、美股（NYSE/NASDAQ）。触发词：价值投资、个股分析、基本面、护城河、moat、DCF、自由现金流、ROIC、安全边际、内在价值、巴菲特、芒格、能力圈、价值陷阱、深度研报、买入逻辑、卖出逻辑、估值。Value investing deep-dive framework — triggers on fundamental analysis, moat assessment, DCF/relative valuation, financial quality diagnosis, business model decomposition, management evaluation, margin of safety, buy/sell decision, peer comparison, value-trap detection. Covers A-shares, HK, US equities. Keywords: value investing, stock analysis, fundamentals, moat, DCF, FCF, ROIC, intrinsic value, margin of safety, Buffett, Munger, circle of competence, value trap.
+description: "价值投资深度分析框架。当用户请求对个股进行基本面分析、护城河评估、DCF/相对估值、财务质量诊断、商业模式拆解、管理层评估、安全边际测算、买入卖出决策、行业对比、价值陷阱识别、深度研报时使用。覆盖 A股（.SH/.SZ/.BJ）、港股（.HK）、美股（NYSE/NASDAQ）。触发词：价值投资、个股分析、基本面、护城河、moat、DCF、自由现金流、ROIC、安全边际、内在价值、巴菲特、芒格、能力圈、价值陷阱、深度研报、买入逻辑、卖出逻辑、估值。Value investing deep-dive framework — triggers on fundamental analysis, moat assessment, DCF/relative valuation, financial quality diagnosis, business model decomposition, management evaluation, margin of safety, buy/sell decision, peer comparison, value-trap detection. Covers A-shares, HK, US equities. Keywords include value investing, stock analysis, fundamentals, moat, DCF, FCF, ROIC, intrinsic value, margin of safety, Buffett, Munger, circle of competence, value trap."
 ---
 
 # 价值投资分析 Skill（v2.0）
